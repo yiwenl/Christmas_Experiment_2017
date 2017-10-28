@@ -5,6 +5,7 @@ import Assets from './Assets';
 import VRUtils from './utils/VRUtils';
 import ViewLines from './ViewLines';
 import ViewPointer from './ViewPointer';
+import ViewTrace from './ViewTrace';
 
 const scissor = function(x, y, w, h) {
 	GL.scissor(x, y, w, h);
@@ -51,6 +52,7 @@ class SceneApp extends Scene {
 
 		
 		this._vPointer = new ViewPointer();
+		this._vTrace = new ViewTrace();
 		this._lines =[];
 
 		// const vLine = new ViewLines();
@@ -126,14 +128,12 @@ class SceneApp extends Scene {
 
 
 	renderScene() {
-		if(Math.random() > .95) {
-			console.log('Num Lines :', this._lines.length);
-		}
 		GL.clear(0, 0, 0, 0);
 
 		this._bAxis.draw();
 		this._lines.forEach( line => line.render() );
 		this._vPointer.render();
+		this._vTrace.render();
 
 
 	}
