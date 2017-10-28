@@ -4,6 +4,7 @@ import alfrid, { Scene, GL } from 'alfrid';
 import Assets from './Assets';
 import VRUtils from './utils/VRUtils';
 import ViewLines from './ViewLines';
+import ViewPointer from './ViewPointer';
 
 const scissor = function(x, y, w, h) {
 	GL.scissor(x, y, w, h);
@@ -48,7 +49,21 @@ class SceneApp extends Scene {
 		this._bDots = new alfrid.BatchDotsPlane();
 		this._bBall = new alfrid.BatchBall();
 
-		this._vLines = new ViewLines();
+		
+		this._vPointer = new ViewPointer();
+		this._lines =[];
+
+		// const vLine = new ViewLines();
+		// vLine.addEventListener('overflowed', ()=>this._createNewLine());
+
+		this._createNewLine();
+	}
+
+
+	_createNewLine() {
+		const vLine = new ViewLines();
+		vLine.addEventListener('overflowed', ()=>this._createNewLine());
+		this._lines.push(vLine);
 	}
 
 
@@ -111,15 +126,16 @@ class SceneApp extends Scene {
 
 
 	renderScene() {
+		if(Math.random() > .95) {
+			console.log('Num Lines :', this._lines.length);
+		}
 		GL.clear(0, 0, 0, 0);
 
 		this._bAxis.draw();
-		this._vLines.render();
+		this._lines.forEach( line => line.render() );
+		this._vPointer.render();
 
-		if(this._vLines.pointer) {
-			const s = .1;
-			this._bBall.draw(this._vLines.pointer, [s, s, s], [1, .8, .6])
-		}
+
 	}
 
 

@@ -1,22 +1,29 @@
 // ViewLines.js
 
-
 import alfrid, { GL } from 'alfrid';
 import fs from 'shaders/lines.frag';
 import VRUtils from './utils/VRUtils';
+import States from 'object-states';
 
 var random = function(min, max) { return min + Math.random() * (max - min);	}
+
+const THRESHOLD_OVERFLOW = 50000;
+const MIN_DISTANCE = 0.001;
 
 class ViewLines extends alfrid.View {
 	
 	constructor() {
 		super(null, fs);
 
-		gui.add(this, 'addLine');
-
 		this.index = 0;
+		this.pointer = [-999, 0, 0];
 
 		this.lastPosition = vec3.create();
+
+		this._buttonsState = new States({mainPressed:false, triggerPressed:false});
+		this._buttonsState.triggerPressed.onChange(o => this._onTriggerChange(o));
+		this._isTriggerPressed = false;
+		this._isActivated = true;
 	}
 
 
@@ -53,29 +60,65 @@ class ViewLines extends alfrid.View {
 	}
 
 
-	render() {
-
+	_checkGamepad() {
 		const { gamePads } = VRUtils;
-		const gamepad = gamePads[0];
-		if(!gamepad) {
-			return;
-		}
+		this.gamepad = gamePads.filter( pad => pad.hand === 'right')[0];
+		
+		if(this.gamepad) {
+			const {buttons, position} = this.gamepad;
+			const buttonStates = buttons.map( button=> button.pressed);
 
-		const {buttons, position} = gamepad;
-		const buttonStates = buttons.map( button=> button.pressed);
-		if(buttonStates[1]) {
-			let dist = vec3.distance(position, this.lastPosition);
+			// this._buttonsState.mainPressed = buttonStates[0];
+			// this._buttonsState.triggerPressed = buttonStates[1];
 
-			if(dist > 0.001) {
-				this.addLine(this.lastPosition, position);
-				vec3.copy(this.lastPosition, position);		
+			this._buttonsState.setState({
+				mainPressed:buttonStates[0],
+				triggerPressed:buttonStates[1]
+			});
+
+			this._isTriggerPressed = buttonStates[1];
+
+			if(this._isTriggerPressed) {
+				let dist = vec3.distance(position, this.lastPosition);
+
+				if(dist > MIN_DISTANCE) {
+					this.addLine(this.lastPosition, position);
+					vec3.copy(this.lastPosition, position);		
+				}
 			}
 		}
 
-		// console.log(buttonStates);
-		this.pointer = position;
+	}
+
+
+	_onTriggerChange(mPressed) {
+		if(!this._isActivated) { return; }
+		if(mPressed) {
+			//	add line
+			const {buttons, position} = this.gamepad;
+			this.addLine(position, position);
+			vec3.copy(this.lastPosition, position);		
+
+		} else {
+			if(this.index > THRESHOLD_OVERFLOW) {
+				this._isActivated = false;
+				this.dispatchCustomEvent('overflowed');
+
+				console.log('overflowed');
+			}
+		}
+	}
+
+
+	render() {
+		if(this._isActivated) {
+			this._checkGamepad();	
+		}
 		
 
+		if(!this.gamepad) {
+			return;
+		}
 
 		this.shader.bind();
 		GL.draw(this.mesh);

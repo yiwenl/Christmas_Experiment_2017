@@ -104,14 +104,11 @@ class VRUtils {
 			if(gamepad && gamepad.pose) {
 				if(!gamepad.pose.position) continue;
 
-				if(Math.random() > .9) {
-					// console.log(gamepad);	
-				}
-
 				const o = {
 					position:gamepad.pose.position,
 					orientation:gamepad.pose.orientation,
-					buttons:gamepad.buttons
+					buttons:gamepad.buttons,
+					hand:gamepad.hand
 				}
 
 				this._gamePads.push(o);
