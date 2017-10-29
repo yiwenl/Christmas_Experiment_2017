@@ -19,9 +19,6 @@ class ViewPointer extends alfrid.View {
 		this.meshPyramid = Assets.get('pyramid');
 		this.meshPointer = Assets.get('pointer');
 
-		this.mtx = mat4.create();
-		this.rotation = quat.create();
-
 		this._offset0 = new alfrid.EaseNumber(0);
 		this._offset1 = new alfrid.EaseNumber(0);
 	}
@@ -31,14 +28,10 @@ class ViewPointer extends alfrid.View {
 		const { gamePads } = VRUtils;
 
 		gamePads.forEach( (gamepad, i) => {
-			const { position, orientation, buttons } = gamepad;
-			mat4.fromRotationTranslation(this.mtx, orientation, position);
-			const buttonStates = buttons.map( button=> button.pressed);
+			const { mtx } = gamepad;
+			this[`_offset${i}`].value = gamepad.isTriggerPressed ? 1 : 0;
 
-			this[`_offset${i}`].value = buttonStates[1] ? 1 : 0;
-
-
-			GL.rotate(this.mtx);
+			GL.rotate(mtx);
 
 			this.shader.bind();
 			this.shader.uniform("offset", "float", 0);

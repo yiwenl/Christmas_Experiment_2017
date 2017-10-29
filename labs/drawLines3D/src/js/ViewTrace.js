@@ -3,7 +3,6 @@
 import alfrid, { GL } from 'alfrid';
 import VRUtils from './utils/VRUtils';
 import Assets from './Assets';
-import States from 'object-states';
 
 const ratio = 1088 / 656;
 
@@ -12,7 +11,9 @@ class ViewTrace extends alfrid.View {
 	constructor() {
 		super(null, alfrid.ShaderLibs.copyFrag);
 
-		this.visible = true;
+		this.visible = false;
+
+		this._gamepad;
 	}
 
 
@@ -22,38 +23,40 @@ class ViewTrace extends alfrid.View {
 
 		this.mtx = mat4.create();
 		this.texture = Assets.get('trace');
-
-		this._buttonsState = new States({mainPressed:false, triggerPressed:false});
-		this._buttonsState.mainPressed.onChange(o => this._onVisibleChange(o));
 	}
 
+
 	_onVisibleChange(o) {
-		if(!o) {
-			console.log('Visible change');
-			this.visible = !this.visible;	
+		this.visible = !this.visible;	
+	}
+
+
+	_checkGamepad() {
+		if(!this._gamepad) {
+			console.log(VRUtils.leftHand);
+			if(VRUtils.leftHand) {
+				this._gamepad = VRUtils.leftHand;
+
+				this._gamepad.addEventListener('mainButtonPressed', (e)=>this._onVisibleChange(e.detail.pressed));
+				this._gamepad.addEventListener('mainButtonPressed', (e)=> {
+					console.log('Main button pressed', e.detail.pressed);
+				});
+			} else {
+				return;
+			}
 		}
-		
 	}
 
 
 	render() {
-
-		const { gamePads } = VRUtils;
-		const gamepad = gamePads.filter( pad => pad.hand === 'left')[0];
-
-		if(!gamepad) {
+		this._checkGamepad();
+		if(!this._gamepad) {
 			return;
 		}
 
-		const {buttons, position, orientation} = gamepad;
-		const buttonStates = buttons.map( button=> button.pressed);
-
-		this._buttonsState.setState({mainPressed:buttonStates[0]});
-
-		if(buttonStates[1]) {
-			mat4.fromRotationTranslation(this.mtx, orientation, position);
+		if(this._gamepad.isTriggerPressed) {
+			mat4.copy(this.mtx, this._gamepad.mtx);
 		}
-
 		GL.rotate(this.mtx);
 
 		this.shader.bind();

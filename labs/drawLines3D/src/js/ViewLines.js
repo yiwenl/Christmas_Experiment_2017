@@ -3,12 +3,11 @@
 import alfrid, { GL } from 'alfrid';
 import fs from 'shaders/lines.frag';
 import VRUtils from './utils/VRUtils';
-import States from 'object-states';
 
 var random = function(min, max) { return min + Math.random() * (max - min);	}
 
 const THRESHOLD_OVERFLOW = 50000;
-const MIN_DISTANCE = 0.001;
+const MIN_DISTANCE = 0.005;
 
 class ViewLines extends alfrid.View {
 	
@@ -17,13 +16,10 @@ class ViewLines extends alfrid.View {
 
 		this.index = 0;
 		this.pointer = [-999, 0, 0];
-
 		this.lastPosition = vec3.create();
-
-		this._buttonsState = new States({mainPressed:false, triggerPressed:false});
-		this._buttonsState.triggerPressed.onChange(o => this._onTriggerChange(o));
-		this._isTriggerPressed = false;
 		this._isActivated = true;
+
+		this._rightHand;
 	}
 
 
@@ -45,9 +41,8 @@ class ViewLines extends alfrid.View {
 
 		this.mesh.bufferVertex(positions);
 		this.mesh.bufferIndex(indices);
-
-
 	}
+
 
 	addLine(a, b) {
 		const offset = this.index * 6 * 4;
@@ -60,32 +55,25 @@ class ViewLines extends alfrid.View {
 	}
 
 
-	_checkGamepad() {
-		const { gamePads } = VRUtils;
-		this.gamepad = gamePads.filter( pad => pad.hand === 'right')[0];
-		
-		if(this.gamepad) {
-			const {buttons, position} = this.gamepad;
-			const buttonStates = buttons.map( button=> button.pressed);
-
-			// this._buttonsState.mainPressed = buttonStates[0];
-			// this._buttonsState.triggerPressed = buttonStates[1];
-
-			this._buttonsState.setState({
-				mainPressed:buttonStates[0],
-				triggerPressed:buttonStates[1]
-			});
-
-			this._isTriggerPressed = buttonStates[1];
-
-			if(this._isTriggerPressed) {
-				let dist = vec3.distance(position, this.lastPosition);
-
-				if(dist > MIN_DISTANCE) {
-					this.addLine(this.lastPosition, position);
-					vec3.copy(this.lastPosition, position);		
-				}
+	_setupGamepad() {
+		if(!this._rightHand) {
+			if(VRUtils.rightHand) {
+				this._rightHand = VRUtils.rightHand;
+				this._rightHand.addEventListener('triggerPressed', (e) => this._onTriggerChange(e.detail.pressed));
+			} else {
+				return;
 			}
+		}
+
+		const { position } = this._rightHand;
+
+		if(this._rightHand.isTriggerPressed) {
+			let dist = vec3.distance(position, this.lastPosition);
+
+			if(dist > MIN_DISTANCE) {
+				this.addLine(this.lastPosition, position);
+				vec3.copy(this.lastPosition, position);		
+			} 
 		}
 
 	}
@@ -95,7 +83,7 @@ class ViewLines extends alfrid.View {
 		if(!this._isActivated) { return; }
 		if(mPressed) {
 			//	add line
-			const {buttons, position} = this.gamepad;
+			const {buttons, position} = this._rightHand;
 			this.addLine(position, position);
 			vec3.copy(this.lastPosition, position);		
 
@@ -103,8 +91,6 @@ class ViewLines extends alfrid.View {
 			if(this.index > THRESHOLD_OVERFLOW) {
 				this._isActivated = false;
 				this.dispatchCustomEvent('overflowed');
-
-				console.log('overflowed');
 			}
 		}
 	}
@@ -112,13 +98,13 @@ class ViewLines extends alfrid.View {
 
 	render() {
 		if(this._isActivated) {
-			this._checkGamepad();	
+			this._setupGamepad();
 		}
-		
 
-		if(!this.gamepad) {
+		if(!this._rightHand) {
 			return;
 		}
+		
 
 		this.shader.bind();
 		GL.draw(this.mesh);

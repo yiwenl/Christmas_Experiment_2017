@@ -1,0 +1,78 @@
+// Gamepad.js
+
+import alfrid from 'alfrid';
+import States from 'object-states';
+
+class Gamepad extends alfrid.EventDispatcher {
+	constructor() {
+		super();
+		this.pulsing = true;
+		this.pulseStrength = 2;
+
+		this.mtx = mat4.create();
+
+		this._buttons = new States({mainPressed:false, triggerPressed:false});
+
+		this._buttons.mainPressed.onChange( o => this._onMainButtonTrigger(o));
+		this._buttons.triggerPressed.onChange( o => this._onTrigger(o));
+
+		this.buttonState = [false, false, false, false];
+	}
+
+
+	update(mData) {
+		this.position = mData.pose.position;
+		this.orientation = mData.pose.orientation;
+		this.buttons = mData.buttons;
+		this.hand = mData.hand;
+		mat4.fromRotationTranslation(this.mtx, this.orientation, this.position);
+
+		if(mData.hapticActuators.length == 0) {
+			this.pulsing = false;
+		}
+
+		if(this.buttons[1].pressed && this.pulsing) {
+			mData.hapticActuators[0].pulse(0.1, this.pulseStrength);
+		}		
+
+		this.buttonState = this.buttons.map( button => button.pressed );
+		this._buttons.setState({
+			mainPressed:this.buttonState[0],
+			triggerPressed:this.buttonState[1],
+			button3Pressed:this.buttonState[2],
+			button4Pressed:this.buttonState[3]
+		});
+
+
+		if(this.buttonState[0]) {
+			this.dispatchCustomEvent('mainButtonDown');
+		}
+
+		if(this.buttonState[1]) {
+			this.dispatchCustomEvent('triggerDown');
+		}
+	}
+
+
+	_onTrigger(o) {
+		const eventName = o ? 'triggerPressed' : 'triggerReleased';
+		this.dispatchCustomEvent(eventName, {pressed:o});
+	}
+
+
+	_onMainButtonTrigger(o) {
+		const eventName = o ? 'mainButtonPressed' : 'mainButtonReleased';
+		this.dispatchCustomEvent(eventName, {pressed:o});
+	}
+
+	get isMainButtonPressed() {
+		return this.buttonState[0];
+	}
+
+	get isTriggerPressed() {
+		return this.buttonState[1];
+	}
+}
+
+
+export default Gamepad;
