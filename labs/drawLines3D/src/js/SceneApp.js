@@ -3,9 +3,12 @@
 import alfrid, { Scene, GL } from 'alfrid';
 import Assets from './Assets';
 import VRUtils from './utils/VRUtils';
+import saveJson from './utils/saveJson';
 import ViewLines from './ViewLines';
 import ViewPointer from './ViewPointer';
 import ViewTrace from './ViewTrace';
+
+import pointsData from './data/points1.json';
 
 const scissor = function(x, y, w, h) {
 	GL.scissor(x, y, w, h);
@@ -28,6 +31,8 @@ class SceneApp extends Scene {
 		this._modelMatrix = mat4.create();
 		console.log('Has VR :', VRUtils.hasVR);
 
+		this._rightHand;
+
 		if(VRUtils.canPresent) {
 			mat4.translate(this._modelMatrix, this._modelMatrix, vec3.fromValues(0, 0, 0));
 			GL.enable(GL.SCISSOR_TEST);
@@ -38,27 +43,16 @@ class SceneApp extends Scene {
 	}
 
 	_initTextures() {
-		console.log('init textures');
 	}
 
 
 	_initViews() {
-		console.log('init views');
-
-		this._bCopy = new alfrid.BatchCopy();
-		this._bAxis = new alfrid.BatchAxis();
-		this._bDots = new alfrid.BatchDotsPlane();
-		this._bBall = new alfrid.BatchBall();
-
-		
 		this._vPointer = new ViewPointer();
 		this._vTrace = new ViewTrace();
 		this._lines =[];
 
-		// const vLine = new ViewLines();
-		// vLine.addEventListener('overflowed', ()=>this._createNewLine());
-
 		this._createNewLine();
+		// this.load();
 	}
 
 
@@ -66,6 +60,32 @@ class SceneApp extends Scene {
 		const vLine = new ViewLines();
 		vLine.addEventListener('overflowed', ()=>this._createNewLine());
 		this._lines.push(vLine);
+	}
+
+	clear() {
+		this._lines = [];
+		this._createNewLine();
+	}
+
+
+	load() {
+		console.log('Loading lines');
+		console.log(pointsData.length);
+		pointsData.forEach( (lineData, i) => {
+			if(!this._lines[i]) {
+				this._createNewLine();
+			}
+
+			const line = this._lines[i];
+			console.log('Load line:', i);
+			line.load(lineData);
+		});
+	}
+
+
+	save() {
+		const pointsData = this._lines.map( line => line.points );
+		saveJson(pointsData, 'points.json');
 	}
 
 
@@ -76,6 +96,14 @@ class SceneApp extends Scene {
 
 	toRender() {
 		if(VRUtils.canPresent) {	VRUtils.vrDisplay.requestAnimationFrame(()=>this.toRender());	}		
+
+		if(!this._rightHand) {
+			if(VRUtils.rightHand) {
+				this._rightHand = VRUtils.rightHand;
+				this._rightHand.addEventListener('mainButtonPressed', ()=>this.clear());
+				this._rightHand.addEventListener('button3Released', ()=>this.save());
+			}
+		}
 
 		VRUtils.getFrameData();
 
@@ -130,20 +158,15 @@ class SceneApp extends Scene {
 	renderScene() {
 		GL.clear(0, 0, 0, 0);
 
-		this._bAxis.draw();
 		this._lines.forEach( line => line.render() );
 		this._vPointer.render();
 		this._vTrace.render();
-
-
 	}
 
 
 	resize() {
 		let scale = VRUtils.canPresent ? 2 : 1;
 		if(GL.isMobile) scale = window.devicePixelRatio;
-
-		console.log('Scale :', scale);
 		GL.setSize(window.innerWidth * scale, window.innerHeight * scale);
 		this.camera.setAspectRatio(GL.aspectRatio);
 	}

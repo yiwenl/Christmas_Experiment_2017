@@ -11,10 +11,12 @@ class Gamepad extends alfrid.EventDispatcher {
 
 		this.mtx = mat4.create();
 
-		this._buttons = new States({mainPressed:false, triggerPressed:false});
+		this._buttons = new States({mainPressed:false, triggerPressed:false, button3Pressed:false, button4Pressed:false});
 
 		this._buttons.mainPressed.onChange( o => this._onMainButtonTrigger(o));
 		this._buttons.triggerPressed.onChange( o => this._onTrigger(o));
+		this._buttons.button3Pressed.onChange( o => this._onButton3Trigger(o));
+		this._buttons.button4Pressed.onChange( o => this._onButton4Trigger(o));
 
 		this.buttonState = [false, false, false, false];
 	}
@@ -64,6 +66,20 @@ class Gamepad extends alfrid.EventDispatcher {
 		const eventName = o ? 'mainButtonPressed' : 'mainButtonReleased';
 		this.dispatchCustomEvent(eventName, {pressed:o});
 	}
+
+
+	_onButton3Trigger(o) {
+		console.log('button3 trigger');
+		const eventName = o ? 'button3Pressed' : 'button3Released';
+		this.dispatchCustomEvent(eventName, {pressed:o});
+	}
+
+	_onButton4Trigger(o) {
+		console.log('button4 trigger');
+		const eventName = o ? 'button4Pressed' : 'button4Released';
+		this.dispatchCustomEvent(eventName, {pressed:o});
+	}
+
 
 	get isMainButtonPressed() {
 		return this.buttonState[0];

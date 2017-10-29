@@ -19,6 +19,9 @@ class ViewLines extends alfrid.View {
 		this.lastPosition = vec3.create();
 		this._isActivated = true;
 
+
+		this._savedPositions = [];
+
 		this._rightHand;
 	}
 
@@ -52,6 +55,9 @@ class ViewLines extends alfrid.View {
 		this.index+=1;
 
 		this.mesh.bufferSubData('aVertexPosition', offset, [p0, p1]);
+
+		this._savedPositions.push([vec3.clone(p0), vec3.clone(p1)]);
+
 	}
 
 
@@ -96,6 +102,27 @@ class ViewLines extends alfrid.View {
 	}
 
 
+	load(mPointsData) {
+		if(!this._rightHand) {
+			alfrid.Scheduler.next(()=>{
+				this.load(mPointsData);
+			});
+			return;
+		}
+
+
+		mPointsData.forEach((seg, i) => {
+			const a = vec3.fromValues(seg[0][0], seg[0][1], seg[0][2]);
+			const b = vec3.fromValues(seg[1][0], seg[1][1], seg[1][2]);
+
+			setTimeout(()=> {
+				this.addLine(a, b);	
+			}, i * 10);
+			
+		});
+	}
+
+
 	render() {
 		if(this._isActivated) {
 			this._setupGamepad();
@@ -110,6 +137,10 @@ class ViewLines extends alfrid.View {
 		GL.draw(this.mesh);
 	}
 
+
+	get points() {
+		return this._savedPositions;
+	}
 
 }
 

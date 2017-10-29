@@ -4,7 +4,8 @@ import alfrid, { GL } from 'alfrid';
 import VRUtils from './utils/VRUtils';
 import Assets from './Assets';
 
-const ratio = 1088 / 656;
+// const ratio = 1088 / 656;
+const ratio = 1000 / 1171;
 
 class ViewTrace extends alfrid.View {
 	
@@ -22,7 +23,7 @@ class ViewTrace extends alfrid.View {
 		this.mesh = alfrid.Geom.plane(s, s / ratio, 1, 'xy');
 
 		this.mtx = mat4.create();
-		this.texture = Assets.get('trace');
+		this.texture = Assets.get('space');
 	}
 
 
@@ -33,7 +34,6 @@ class ViewTrace extends alfrid.View {
 
 	_checkGamepad() {
 		if(!this._gamepad) {
-			console.log(VRUtils.leftHand);
 			if(VRUtils.leftHand) {
 				this._gamepad = VRUtils.leftHand;
 
