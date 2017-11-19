@@ -103,12 +103,12 @@ class ViewLines extends alfrid.View {
 
 
 	load(mPointsData) {
-		if(!this._rightHand) {
-			alfrid.Scheduler.next(()=>{
-				this.load(mPointsData);
-			});
-			return;
-		}
+		// if(!this._rightHand) {
+		// 	alfrid.Scheduler.next(()=>{
+		// 		this.load(mPointsData);
+		// 	});
+		// 	return;
+		// }
 
 
 		mPointsData.forEach((seg, i) => {
@@ -124,13 +124,13 @@ class ViewLines extends alfrid.View {
 
 
 	render() {
-		if(this._isActivated) {
-			this._setupGamepad();
-		}
+		// if(this._isActivated) {
+		// 	this._setupGamepad();
+		// }
 
-		if(!this._rightHand) {
-			return;
-		}
+		// if(!this._rightHand) {
+		// 	return;
+		// }
 		
 
 		this.shader.bind();

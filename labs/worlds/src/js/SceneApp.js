@@ -3,12 +3,12 @@
 import alfrid, { Scene, GL } from 'alfrid';
 import Assets from './Assets';
 import VRUtils from './utils/VRUtils';
-import saveJson from './utils/saveJson';
-import ViewLines from './ViewLines';
-import ViewPointer from './ViewPointer';
-import ViewTrace from './ViewTrace';
 
-import pointsData from './data/points1.json';
+import ViewSphere from './ViewSphere';
+import ViewSave from './ViewSave';
+import ViewRender from './ViewRender';
+import ViewSim from './ViewSim';
+import ViewPointer from './ViewPointer';
 
 const scissor = function(x, y, w, h) {
 	GL.scissor(x, y, w, h);
@@ -18,13 +18,13 @@ const scissor = function(x, y, w, h) {
 class SceneApp extends Scene {
 	constructor() {
 		super();
-
-		console.log(pointsData);
 		
 		//	ORBITAL CONTROL
 		this.orbitalControl.rx.value = this.orbitalControl.ry.value = 0.1;
 		this.orbitalControl.radius.value = 5;
-		this.camera.setPerspective(Math.PI * .3, GL.aspectRatio, .1, 100000);
+
+
+		this._count = 0;
 
 
 		//	VR CAMERA
@@ -34,10 +34,8 @@ class SceneApp extends Scene {
 		this._modelMatrix = mat4.create();
 		console.log('Has VR :', VRUtils.hasVR);
 
-		this._rightHand;
-
 		if(VRUtils.canPresent) {
-			mat4.translate(this._modelMatrix, this._modelMatrix, vec3.fromValues(0, 0, 0));
+			mat4.translate(this._modelMatrix, this._modelMatrix, vec3.fromValues(0, 0, -3));
 			GL.enable(GL.SCISSOR_TEST);
 			this.toRender();
 
@@ -46,68 +44,92 @@ class SceneApp extends Scene {
 	}
 
 	_initTextures() {
+		// console.log('init textures');
+
+		console.log(GL.width, window.innerWidth);
+
+		this._fboMap = new alfrid.FrameBuffer(1024, 1024, {minFilter:GL.LINEAR, magFilter:GL.LINEAR});
+		const numParticles = params.numParticles;
+		const o = {
+			minFilter:GL.NEAREST,
+			magFilter:GL.NEAREST,
+			type:GL.FLOAT
+		};
+
+		this._fboCurrent  	= new alfrid.FrameBuffer(numParticles, numParticles, o, true);
+		this._fboTarget  	= new alfrid.FrameBuffer(numParticles, numParticles, o, true);
 	}
 
 
 	_initViews() {
+		console.log('init views');
+
+		this._bCopy = new alfrid.BatchCopy();
+		this._vSphere = new ViewSphere();
 		this._vPointer = new ViewPointer();
-		this._vTrace = new ViewTrace();
-		this._lines =[];
-		this._bAxis = new alfrid.BatchAxis();
 
-		this._createNewLine();
-		this.load();
+
+		//	views
+		this._vRender = new ViewRender();
+		this._vSim 	  = new ViewSim();
+
+		this._vSave = new ViewSave();
+		GL.setMatrices(this.cameraOrtho);
+
+
+		this._fboCurrent.bind();
+		GL.clear(0, 0, 0, 0);
+		this._vSave.render();
+		this._fboCurrent.unbind();
+
+		this._fboTarget.bind();
+		GL.clear(0, 0, 0, 0);
+		this._vSave.render();
+		this._fboTarget.unbind();
+
+		GL.setMatrices(this.camera);
 	}
 
 
-	_createNewLine() {
-		const vLine = new ViewLines();
-		vLine.addEventListener('overflowed', ()=>this._createNewLine());
-		this._lines.push(vLine);
+	updateFbo() {
+		this._fboTarget.bind();
+		GL.clear(0, 0, 0, 1);
+		VRUtils.setCamera(this.cameraVR, 'left');
+		GL.setMatrices(this.cameraVR);
+		GL.rotate(this._modelMatrix);
+		this._vSim.render(this._fboCurrent.getTexture(1), this._fboCurrent.getTexture(0), this._fboCurrent.getTexture(2), this._fboMap.getTexture());
+		this._fboTarget.unbind();
+
+
+		let tmp          = this._fboCurrent;
+		this._fboCurrent = this._fboTarget;
+		this._fboTarget  = tmp;
+
 	}
 
-	clear() {
-		this._lines = [];
-		this._createNewLine();
-	}
-
-
-	load() {
-		console.log('Loading lines');
-		console.log(pointsData.length);
-		pointsData.forEach( (lineData, i) => {
-			if(!this._lines[i]) {
-				this._createNewLine();
-			}
-
-			const line = this._lines[i];
-			console.log('Load line:', i);
-			line.load(lineData);
-		});
-	}
-
-
-	save() {
-		const pointsData = this._lines.map( line => line.points );
-		saveJson(pointsData, 'points.json');
+	_updateMap() {
+		this._fboMap.bind();
+		GL.clear(0, 0, 0, 1);
+		this._vSphere.render();
+		this._fboMap.unbind();
 	}
 
 
 	render() {
+		this._updateMap();
+
+		this._count ++;
+		if(this._count % params.skipCount == 0) {
+			this._count = 0;
+			this.updateFbo();
+		}
+
 		if(!VRUtils.canPresent) { this.toRender(); }
 	}
 
 
 	toRender() {
 		if(VRUtils.canPresent) {	VRUtils.vrDisplay.requestAnimationFrame(()=>this.toRender());	}		
-
-		if(!this._rightHand) {
-			if(VRUtils.rightHand) {
-				this._rightHand = VRUtils.rightHand;
-				this._rightHand.addEventListener('mainButtonPressed', ()=>this.clear());
-				this._rightHand.addEventListener('button3Released', ()=>this.save());
-			}
-		}
 
 		VRUtils.getFrameData();
 
@@ -139,6 +161,7 @@ class SceneApp extends Scene {
 			GL.rotate(this._modelMatrix);
 			this.renderScene();
 
+
 		} else {
 
 			if(VRUtils.canPresent) {
@@ -162,19 +185,22 @@ class SceneApp extends Scene {
 	renderScene() {
 		GL.clear(0, 0, 0, 0);
 
-		this._bAxis.draw();
+		this._vSphere.render();
 
-		this._lines.forEach( line => line.render() );
+		let p = this._count / params.skipCount;
+		this._vRender.render(this._fboTarget.getTexture(0), this._fboCurrent.getTexture(0), p, this._fboCurrent.getTexture(2), this._fboTarget.getTexture(3));
 		this._vPointer.render();
-		this._vTrace.render();
 	}
 
 
 	resize() {
 		let scale = VRUtils.canPresent ? 2 : 1;
 		if(GL.isMobile) scale = window.devicePixelRatio;
+		
 		GL.setSize(window.innerWidth * scale, window.innerHeight * scale);
 		this.camera.setAspectRatio(GL.aspectRatio);
+
+		// this._fboMap = new alfrid.FrameBuffer(GL.width, GL.height, {minFilter:GL.LINEAR, magFilter:GL.LINEAR});
 	}
 
 }
