@@ -11,6 +11,21 @@ class ViewSphere extends alfrid.View {
 		super(vs, fs);
 
 		this.range = 0.001;
+		// this.offset = new alfrid.EaseNumber(1, 0.05);
+		this.offset = new alfrid.TweenNumber(1, 'expInOut', 0.005);
+
+		gui.add(this, 'open');
+		gui.add(this, 'close');
+	}
+
+
+	open() {
+		this.offset.value = 0;
+	}
+
+
+	close() {
+		this.offset.value = 1;
 	}
 
 
@@ -26,6 +41,8 @@ class ViewSphere extends alfrid.View {
 		this.shader.bind();
 		this.shader.uniform("uRange", "float", this.range);
 		GL.draw(this.mesh);
+		this.shader.uniform("uOffset", "float", this.offset.value);
+		this.shader.uniform("uTime", "float", alfrid.Scheduler.deltaTime);
 		GL.gl.cullFace(GL.gl.BACK);
 	}
 

@@ -27,7 +27,7 @@ const writeTemplate = (str) => new Promise((resolve, reject) => {
 
 watcherViews.on('all', (event, file) => {
 	if(file.indexOf('.html') === -1) return;
-
+	console.log('file change :' , file);
 	fs.readFile(file, 'utf8')
 	.then( processTemplate )
 	.then( writeTemplate )

@@ -112,11 +112,7 @@ class SceneApp extends Scene {
 
 	renderScene() {
 		GL.clear(0, 0, 0, 0);
-		this._bSky.draw(Assets.get('irr'));
-
 		this._bAxis.draw();
-
-		this._vModel.render(Assets.get('studio_radiance'), Assets.get('irr'), Assets.get('aomap'));
 	}
 
 

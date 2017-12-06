@@ -18,19 +18,15 @@ class SceneApp extends Scene {
 		this.resize();
 		GL.enableAlphaBlending();
 		this.orbitalControl.radius.value = 5;
-
-		this.orbitalControl.lock(true);
-
-
-		this.cameraSphere = new alfrid.CameraPerspective();
 		const FOV = 90 * RAD;
-		this.cameraSphere.setPerspective(FOV, GL.aspectRatio, .1, 100);
+		this.orbitalControl.lock(true);
+		this.cameraSphere = new alfrid.CameraPerspective();
+		
+		this.cameraSphere.setPerspective(FOV, GL.aspectRatio, .1, 1000);
 		this.orbControlSphere = new alfrid.OrbitalControl(this.cameraSphere, window, .01);
 		const easing = 0.1;
 		this.orbControlSphere.rx.easing = easing;
 		this.orbControlSphere.ry.easing = easing;
-		// this.orbControlSphere.rx.value = -.85;
-		this.orbControlSphere.ry.value = .3;
 
 		this.modelMatrix = mat4.create();
 	}
@@ -112,6 +108,7 @@ class SceneApp extends Scene {
 		GL.rotate(this.modelMatrix);
 		this._vSpirit.render(this._fboMap.getTexture());
 
+		// this._vSphere.render();
 
 		GL.enable(GL.DEPTH_TEST);
 		this._vRender.render(this._fboTarget.getTexture(0), this._fboTarget.getTexture(2), this._fboTarget.getTexture(3));

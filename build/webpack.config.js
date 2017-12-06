@@ -73,9 +73,9 @@ const config = {
 				use: isProd ?
 				ExtractTextPlugin.extract({
 					fallback:"style-loader",
-					use: ["css-loader", "sass-loader"]
+					use: ["css-loader?url=false", "sass-loader"]
 				}) : 
-				["style-loader", "css-loader", "sass-loader"]
+				["style-loader", "css-loader?url=false", "sass-loader"]
 				,
 				exclude: pathNodeModules
 			},
@@ -83,6 +83,13 @@ const config = {
 				test: /\.(glsl|vert|frag)$/,
 				use: ["raw-loader", "glslify-loader"],
 				exclude: pathNodeModules
+			},
+			{
+				test: /\.(jpe?g|png|gif|svg)$/i,
+				loaders: [
+					'file-loader?hash=sha512&digest=hex&name=[hash].[ext]',
+					'image-webpack-loader?bypassOnDebug&optimizationLevel=7&interlaced=false'
+				]
 			}
 		]
 	},
