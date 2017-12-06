@@ -172,16 +172,10 @@ class SceneApp extends Scene {
 	renderScene() {
 		GL.clear(0, 0, 0, 0);
 
-		GL.disable(GL.DEPTH_TEST);
-		this._bCopy.draw(this._fboMap.getTexture());
-		GL.enable(GL.DEPTH_TEST);
-
-
+		this._vSphere.render();
 		this._vFloor.render();
-		this._sceneParticles.render();
+		// this._sceneParticles.render();
 		this._vPointer.render();
-
-		
 
 	}
 
