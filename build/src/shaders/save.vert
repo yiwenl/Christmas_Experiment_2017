@@ -1,4 +1,4 @@
-// basic.vert
+// save.vert
 
 precision highp float;
 attribute vec3 aVertexPosition;
@@ -10,10 +10,14 @@ uniform mat4 uViewMatrix;
 uniform mat4 uProjectionMatrix;
 
 varying vec2 vTextureCoord;
+varying vec3 vColor;
 varying vec3 vNormal;
 
 void main(void) {
-    gl_Position = uProjectionMatrix * uViewMatrix * uModelMatrix * vec4(aVertexPosition, 1.0);
-    vTextureCoord = aTextureCoord;
+	vColor      = aVertexPosition;
+	vec3 pos    = vec3(aTextureCoord, 0.0);
+	gl_Position = uProjectionMatrix * uViewMatrix * uModelMatrix * vec4(pos, 1.0);
+
+    gl_PointSize = 1.0;
     vNormal = aNormal;
 }

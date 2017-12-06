@@ -3,6 +3,7 @@
 import alfrid, { Scene, GL } from 'alfrid';
 import Assets from './Assets';
 import VRUtils from './utils/VRUtils';
+import SubsceneParticles from './SubsceneParticles';
 import ViewSphere from './views/ViewSphere';
 import ViewFloor from './views/ViewFloor';
 
@@ -21,6 +22,8 @@ class SceneApp extends Scene {
 		this.orbitalControl.lock(true);
 
 
+		this._initSubScene();
+
 		//	VR CAMERA
 		this.cameraVR = new alfrid.Camera();
 
@@ -35,6 +38,12 @@ class SceneApp extends Scene {
 
 			this.resize();
 		}
+
+	}
+
+
+	_initSubScene() {
+		this._sceneParticles = new SubsceneParticles(this);
 	}
 
 	_initTextures() {
@@ -67,6 +76,7 @@ class SceneApp extends Scene {
 
 	render() {
 		this._updateMap();
+		this._sceneParticles.update();
 
 		if(!VRUtils.canPresent) { this.toRender(); }
 	}
@@ -129,10 +139,12 @@ class SceneApp extends Scene {
 		GL.clear(0, 0, 0, 0);
 
 		GL.disable(GL.DEPTH_TEST);
-		this._bCopy.draw(this._fboMap.getTexture());
+		// this._bCopy.draw(this._fboMap.getTexture());
 		GL.enable(GL.DEPTH_TEST);
 
-		this._vFloor.render();
+		// this._sceneParticles.render();
+
+		// this._vFloor.render();
 
 	}
 

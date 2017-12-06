@@ -16,8 +16,8 @@ if(document.body) {
 
 
 window.params = {
-	gamma:2.2,
-	exposure:5
+	numParticles:256,
+	maxRadius: 2.5
 };
 
 function _init() {
@@ -105,7 +105,4 @@ function _init3D() {
 	scene = new SceneApp();
 
 	//	STATS
-	const stats = new Stats();
-	document.body.appendChild(stats.domElement);
-	alfrid.Scheduler.addEF(()=>stats.update());
 }
