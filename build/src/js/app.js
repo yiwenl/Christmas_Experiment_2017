@@ -20,6 +20,7 @@ window.params = {
 	maxRadius: 2.5
 };
 
+
 function _init() {
 
 	//	LOADING ASSETS

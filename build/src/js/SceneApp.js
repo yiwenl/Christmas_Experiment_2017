@@ -6,6 +6,8 @@ import VRUtils from './utils/VRUtils';
 import SubsceneParticles from './SubsceneParticles';
 import ViewSphere from './views/ViewSphere';
 import ViewFloor from './views/ViewFloor';
+import ViewLine from './views/ViewLine';
+import ViewPointer from './views/ViewPointer';
 
 const scissor = function(x, y, w, h) {
 	GL.scissor(x, y, w, h);
@@ -29,7 +31,6 @@ class SceneApp extends Scene {
 
 		//	MODEL MATRIX
 		this._modelMatrix = mat4.create();
-		console.log('Has VR :', VRUtils.hasVR);
 
 		if(VRUtils.canPresent) {
 			mat4.translate(this._modelMatrix, this._modelMatrix, vec3.fromValues(0, 0, -3));
@@ -39,6 +40,25 @@ class SceneApp extends Scene {
 			this.resize();
 		}
 
+
+		//	LIGHT
+		this._cameraLight = new alfrid.CameraOrtho();
+		const s = 8;
+		this._cameraLight.ortho(-s, s, -s, s, .5, 50);
+		this._cameraLight.lookAt([0, 10, 0], [0, 0, 0], [0, 0, -1]);
+		this._cameraLight.lookAt([0, 10, 5], [0, 0, 0]);
+		this._shadowMatrix = mat4.create();
+		this._biasMatrix = mat4.fromValues(
+			0.5, 0.0, 0.0, 0.0,
+			0.0, 0.5, 0.0, 0.0,
+			0.0, 0.0, 0.5, 0.0,
+			0.5, 0.5, 0.5, 1.0
+		);
+
+		mat4.multiply(this._shadowMatrix, this._cameraLight.projection, this._cameraLight.viewMatrix);
+		mat4.multiply(this._shadowMatrix, this._biasMatrix, this._shadowMatrix);
+
+
 	}
 
 
@@ -47,9 +67,8 @@ class SceneApp extends Scene {
 	}
 
 	_initTextures() {
-		console.log('init textures');
-
-		this._fboMap = new alfrid.FrameBuffer(1024, 1024);
+		this._fboMap = new alfrid.FrameBuffer(1024, 1024, {minFilter:GL.LINEAR, magFilter:GL.LINEAR});
+		this._fboShadow 	= new alfrid.FrameBuffer(1024, 1024, {minFilter:GL.LINEAR, magFilter:GL.LINEAR});
 	}
 
 
@@ -62,6 +81,10 @@ class SceneApp extends Scene {
 
 		this._vSphere = new ViewSphere();
 		this._vFloor = new ViewFloor();
+		this._vPointer = new ViewPointer();
+
+		//	load drawings
+		this._lines = [];
 
 	}
 
@@ -73,10 +96,21 @@ class SceneApp extends Scene {
 		this._fboMap.unbind();
 	}
 
+	_updateShadowMap() {
+		this._fboShadow.bind();
+		GL.clear(0, 0, 0, 0);
+		GL.setMatrices(this._cameraLight);
+
+		this._fboShadow.unbind();
+
+		GL.setMatrices(this.camera);
+	}
+
 
 	render() {
 		this._updateMap();
 		this._sceneParticles.update();
+		this._updateShadowMap();
 
 		if(!VRUtils.canPresent) { this.toRender(); }
 	}
@@ -142,9 +176,12 @@ class SceneApp extends Scene {
 		// this._bCopy.draw(this._fboMap.getTexture());
 		GL.enable(GL.DEPTH_TEST);
 
-		// this._sceneParticles.render();
 
-		// this._vFloor.render();
+		this._vFloor.render();
+		this._sceneParticles.render();
+		this._vPointer.render();
+
+		
 
 	}
 
