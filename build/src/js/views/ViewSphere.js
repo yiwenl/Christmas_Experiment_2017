@@ -25,7 +25,6 @@ class ViewSphere extends alfrid.View {
 			this._useGamepad = true;
 			this.mtx = mat4.create();
 		} else {
-			console.log('here');
 			this.cameraSphere = new alfrid.Camera();
 			this.orbControlSphere = new alfrid.OrbitalControl(this.cameraSphere, window, .01);
 			const easing = 0.1;

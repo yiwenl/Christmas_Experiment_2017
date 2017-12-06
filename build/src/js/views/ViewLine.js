@@ -4,7 +4,7 @@ import alfrid, { GL } from 'alfrid';
 import Line from './Line';
 import vs from 'shaders/line2.vert';
 import fs from 'shaders/line.frag';
-import VRUtils from './utils/VRUtils';
+import VRUtils from '../utils/VRUtils';
 
 const THRESHOLD_OVERFLOW = 50000;
 const MIN_DISTANCE = 0.005;

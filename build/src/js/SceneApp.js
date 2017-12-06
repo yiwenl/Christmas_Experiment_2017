@@ -173,7 +173,7 @@ class SceneApp extends Scene {
 		GL.clear(0, 0, 0, 0);
 
 		GL.disable(GL.DEPTH_TEST);
-		// this._bCopy.draw(this._fboMap.getTexture());
+		this._bCopy.draw(this._fboMap.getTexture());
 		GL.enable(GL.DEPTH_TEST);
 
 
