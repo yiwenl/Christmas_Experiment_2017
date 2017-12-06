@@ -1,9 +1,10 @@
 // SceneApp.js
 
 import alfrid, { Scene, GL } from 'alfrid';
-import ViewObjModel from './ViewObjModel';
 import Assets from './Assets';
 import VRUtils from './utils/VRUtils';
+import ViewSphere from './views/ViewSphere';
+import ViewFloor from './views/ViewFloor';
 
 const scissor = function(x, y, w, h) {
 	GL.scissor(x, y, w, h);
@@ -16,7 +17,8 @@ class SceneApp extends Scene {
 		
 		//	ORBITAL CONTROL
 		this.orbitalControl.rx.value = this.orbitalControl.ry.value = 0.1;
-		this.orbitalControl.radius.value = 5;
+		this.orbitalControl.radius.value = .1;
+		this.orbitalControl.lock(true);
 
 
 		//	VR CAMERA
@@ -37,6 +39,8 @@ class SceneApp extends Scene {
 
 	_initTextures() {
 		console.log('init textures');
+
+		this._fboMap = new alfrid.FrameBuffer(1024, 1024);
 	}
 
 
@@ -46,13 +50,24 @@ class SceneApp extends Scene {
 		this._bCopy = new alfrid.BatchCopy();
 		this._bAxis = new alfrid.BatchAxis();
 		this._bDots = new alfrid.BatchDotsPlane();
-		this._bSky = new alfrid.BatchSkybox();
 
-		this._vModel = new ViewObjModel();
+		this._vSphere = new ViewSphere();
+		this._vFloor = new ViewFloor();
+
+	}
+
+
+	_updateMap() {
+		this._fboMap.bind();
+		GL.clear(0, 0, 0, 1);
+		this._vSphere.render();
+		this._fboMap.unbind();
 	}
 
 
 	render() {
+		this._updateMap();
+
 		if(!VRUtils.canPresent) { this.toRender(); }
 	}
 
@@ -112,7 +127,13 @@ class SceneApp extends Scene {
 
 	renderScene() {
 		GL.clear(0, 0, 0, 0);
-		this._bAxis.draw();
+
+		GL.disable(GL.DEPTH_TEST);
+		this._bCopy.draw(this._fboMap.getTexture());
+		GL.enable(GL.DEPTH_TEST);
+
+		this._vFloor.render();
+
 	}
 
 
