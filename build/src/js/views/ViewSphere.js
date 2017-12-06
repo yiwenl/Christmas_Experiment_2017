@@ -23,6 +23,7 @@ class ViewSphere extends alfrid.View {
 		this._useGamepad = false;
 		if(VRUtils.hasVR) {
 			this._useGamepad = true;
+			this.mtx = mat4.create();
 		} else {
 			console.log('here');
 			this.cameraSphere = new alfrid.Camera();
@@ -42,6 +43,21 @@ class ViewSphere extends alfrid.View {
 		*/
 	}
 
+	_checkGamePad() {
+		if(!this._gamepad) {
+			if(VRUtils.rightHand) {
+				this._gamepad = VRUtils.rightHand;
+			} else if(VRUtils.leftHand) {
+				this._gamepad = VRUtils.leftHand;
+			} else {
+				return;
+			}
+		}
+		
+		mat4.fromQuat(this.mtx, this._gamepad.orientation);
+
+	}
+
 
 	render() {
 		GL.gl.cullFace(GL.gl.FRONT);
@@ -49,6 +65,12 @@ class ViewSphere extends alfrid.View {
 
 		if(this._useGamepad) {
 
+			this._checkGamePad();
+			if(!this._gamepad) {
+				return;
+			}
+
+			GL.rotate(this.mtx);
 		} else {
 			GL.rotate(this.cameraSphere.matrix);
 		}
