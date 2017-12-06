@@ -21,7 +21,7 @@ class ViewSphere extends alfrid.View {
 		//	get control
 
 		this._useGamepad = false;
-		if(VRUtils.hasVR) {
+		if(VRUtils.hasVR && !GL.isMobile) {
 			this._useGamepad = true;
 			this.mtx = mat4.create();
 		} else {

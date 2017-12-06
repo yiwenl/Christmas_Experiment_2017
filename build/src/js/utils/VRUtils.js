@@ -31,7 +31,7 @@ class VRUtils {
 				this._vrDisplay = vrDisplay;
 				this._frameData = new VRFrameData();
 
-				this.hasVR = true;
+				this.hasVR = vrDisplay.displayName.indexOf('Mouse and Keyboard') == -1;
 
 				mCallback(vrDisplay);
 			} else {

@@ -5,11 +5,10 @@ import Assets from './Assets';
 import VRUtils from './utils/VRUtils';
 import saveJson from './utils/saveJson';
 import ViewLine from './ViewLine';
-import ViewLines from './ViewLines';
 import ViewPointer from './ViewPointer';
 import ViewTrace from './ViewTrace';
 
-import pointsData from './data/points1.json';
+import pointsData from './data/points.json';
 
 const scissor = function(x, y, w, h) {
 	GL.scissor(x, y, w, h);
@@ -19,8 +18,6 @@ const scissor = function(x, y, w, h) {
 class SceneApp extends Scene {
 	constructor() {
 		super();
-
-		console.log(pointsData);
 		
 		//	ORBITAL CONTROL
 		this.orbitalControl.rx.value = this.orbitalControl.ry.value = 0.1;
@@ -58,6 +55,10 @@ class SceneApp extends Scene {
 
 		this._createNewLine();
 		// this.load();
+
+
+
+		gui.add(this, 'load');
 	}
 
 
@@ -86,11 +87,11 @@ class SceneApp extends Scene {
 		console.log(pointsData.length);
 		pointsData.forEach( (lineData, i) => {
 			if(!this._lines[i]) {
-				this._createNewLine();
+				const l = new ViewLine();
+				this._lines.push(l);
 			}
 
 			const line = this._lines[i];
-			// console.log('Load line:', i);
 			line.load(lineData);
 		});
 	}

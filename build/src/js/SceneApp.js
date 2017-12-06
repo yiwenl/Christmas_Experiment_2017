@@ -33,7 +33,7 @@ class SceneApp extends Scene {
 		this._modelMatrix = mat4.create();
 
 		if(VRUtils.canPresent) {
-			mat4.translate(this._modelMatrix, this._modelMatrix, vec3.fromValues(0, 0, -3));
+			// mat4.translate(this._modelMatrix, this._modelMatrix, vec3.fromValues(0, 0, -3));
 			GL.enable(GL.SCISSOR_TEST);
 			this.toRender();
 
@@ -100,17 +100,21 @@ class SceneApp extends Scene {
 		this._fboShadow.bind();
 		GL.clear(0, 0, 0, 0);
 		GL.setMatrices(this._cameraLight);
-
 		this._fboShadow.unbind();
-
-		GL.setMatrices(this.camera);
 	}
 
 
 	render() {
-		this._updateMap();
+		// this._updateMap();
 		this._sceneParticles.update();
 		this._updateShadowMap();
+
+		if(GL.isMobile && 0) {
+			GL.setMatrices(this.camera);
+			GL.rotate(this._modelMatrix);
+			this.renderScene();	
+			return;
+		}
 
 		if(!VRUtils.canPresent) { this.toRender(); }
 	}
@@ -121,7 +125,7 @@ class SceneApp extends Scene {
 
 		VRUtils.getFrameData();
 
-		if(VRUtils.isPresenting) {
+		if(VRUtils.isPresenting && !GL.isMobile) {
 			
 			const w2 = GL.width/2;
 			VRUtils.setCamera(this.cameraVR, 'left');
@@ -175,14 +179,16 @@ class SceneApp extends Scene {
 		this._vSphere.render();
 		this._vFloor.render();
 		// this._sceneParticles.render();
-		this._vPointer.render();
+		if(!GL.isMobile && VRUtils.hasVR) {
+			this._vPointer.render();	
+		}
 
 	}
 
 
 	resize() {
 		let scale = VRUtils.canPresent ? 2 : 1;
-		if(GL.isMobile) scale = window.devicePixelRatio;
+		if(GL.isMobile) scale = 1;
 		GL.setSize(window.innerWidth * scale, window.innerHeight * scale);
 		this.camera.setAspectRatio(GL.aspectRatio);
 	}

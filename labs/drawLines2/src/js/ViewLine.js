@@ -33,6 +33,18 @@ class ViewLine2 extends alfrid.View {
 	_init() {
 	}
 
+	load(points) {
+
+		const newPoints = points.map( o => {
+			return [o[0], o[1], o[2]];
+		})
+
+		console.log('Loading points :', newPoints);
+
+
+		this.update(newPoints);
+	}
+
 
 	update(points) {
 		if(!this.mesh) {
@@ -100,13 +112,14 @@ class ViewLine2 extends alfrid.View {
 			this._setupGamepad();
 		}
 
-		if(!this._rightHand) {
-			return;
-		}
+		// if(!this._rightHand) {
+		// 	return;
+		// }
 
 		if(!this.mesh) {
 			return;
 		}
+
 
 		this.shader.bind();
 		this.shader.uniform("aspect", "float", window.innerWidth / window.innerHeight);

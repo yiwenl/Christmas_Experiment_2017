@@ -23,6 +23,9 @@ class Gamepad extends alfrid.EventDispatcher {
 
 
 	update(mData) {
+		if(!mData) {
+			return;
+		}
 		this.position = mData.pose.position;
 		this.orientation = mData.pose.orientation;
 		this.buttons = mData.buttons;
