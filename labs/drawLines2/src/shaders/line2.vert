@@ -47,7 +47,7 @@ void main() {
 
 	vCounters = aCounters;
 
-	float len = thickness *  sin(width+uTime) * (1.-smoothstep(.9,1.,vUV.x*1.));
+	float len = thickness * sin(width) * (1.-smoothstep(.9,1.,vUV.x*1.));
 	float orientation = direction;
 
 	//starting point uses (next - current)

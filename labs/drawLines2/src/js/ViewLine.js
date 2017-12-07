@@ -25,7 +25,7 @@ class ViewLine2 extends alfrid.View {
 		this.shader.uniform("uTime", "float", 0);
 		this.shader.uniform("ratio", "float", 0);
 		this.shader.uniform("alpha", "float", 1);
-		this.shader.uniform("thickness", "float", 1);
+		this.shader.uniform("thickness", "float", .25);
 		
 	}
 
@@ -49,7 +49,7 @@ class ViewLine2 extends alfrid.View {
 	update(points) {
 		if(!this.mesh) {
 			this.mesh = new Line(points, (p)=>{
-				return p * 0.05;
+				return p * 0.02;
 			});
 		}
 

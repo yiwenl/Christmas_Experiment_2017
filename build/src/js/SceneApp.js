@@ -4,6 +4,7 @@ import alfrid, { Scene, GL } from 'alfrid';
 import Assets from './Assets';
 import VRUtils from './utils/VRUtils';
 import SubsceneParticles from './SubsceneParticles';
+import SubsceneChars from './SubsceneChars';
 import ViewSphere from './views/ViewSphere';
 import ViewFloor from './views/ViewFloor';
 import ViewLine from './views/ViewLine';
@@ -64,6 +65,7 @@ class SceneApp extends Scene {
 
 	_initSubScene() {
 		this._sceneParticles = new SubsceneParticles(this);
+		this._sceneChars = new SubsceneChars(this);
 	}
 
 	_initTextures() {
@@ -175,10 +177,12 @@ class SceneApp extends Scene {
 
 	renderScene() {
 		GL.clear(0, 0, 0, 0);
-
+		GL.disable(GL.DEPTH_TEST);
 		this._vSphere.render();
+		GL.enable(GL.DEPTH_TEST);
 		this._vFloor.render();
-		// this._sceneParticles.render();
+		this._sceneParticles.render();
+		this._sceneChars.render();
 		if(!GL.isMobile && VRUtils.hasVR) {
 			this._vPointer.render();	
 		}

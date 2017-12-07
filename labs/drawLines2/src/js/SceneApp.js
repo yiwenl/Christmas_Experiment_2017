@@ -9,6 +9,7 @@ import ViewPointer from './ViewPointer';
 import ViewTrace from './ViewTrace';
 
 import pointsData from './data/points.json';
+import kidData from './data/kid.json';
 
 const scissor = function(x, y, w, h) {
 	GL.scissor(x, y, w, h);
@@ -18,6 +19,8 @@ const scissor = function(x, y, w, h) {
 class SceneApp extends Scene {
 	constructor() {
 		super();
+
+		console.log(kidData);
 		
 		//	ORBITAL CONTROL
 		this.orbitalControl.rx.value = this.orbitalControl.ry.value = 0.1;
@@ -85,13 +88,24 @@ class SceneApp extends Scene {
 	load() {
 		// console.log('Loading lines');
 		console.log(pointsData.length);
-		pointsData.forEach( (lineData, i) => {
-			if(!this._lines[i]) {
+		// pointsData.forEach( (lineData, i) => {
+		// 	if(!this._lines[i]) {
+		// 		const l = new ViewLine();
+		// 		this._lines.push(l);
+		// 	}
+
+		// 	const line = this._lines[i];
+		// 	line.load(lineData);
+		// });
+
+		kidData.forEach( (lineData, i) => {
+			let index =  i;
+			if(!this._lines[index]) {
 				const l = new ViewLine();
 				this._lines.push(l);
 			}
 
-			const line = this._lines[i];
+			const line = this._lines[index];
 			line.load(lineData);
 		});
 	}

@@ -17,7 +17,7 @@ uniform vec2 uViewport;
 varying vec4 vColor;
 varying vec3 vNormal;
 
-const float radius = 0.01;
+const float radius = 0.002;
 
 void main(void) {
 	vec2 uv      = aVertexPosition.xy;

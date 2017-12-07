@@ -10,7 +10,7 @@ class ViewFloor extends alfrid.View {
 		super(vs, fs);
 
 		this.mtxModel = mat4.create();
-		mat4.translate(this.mtxModel, this.mtxModel, vec3.fromValues(0, -.5, -1));
+		mat4.translate(this.mtxModel, this.mtxModel, vec3.fromValues(0, -0.75, -1));
 	}
 
 

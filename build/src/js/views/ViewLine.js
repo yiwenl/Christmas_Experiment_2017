@@ -11,7 +11,7 @@ const MIN_DISTANCE = 0.005;
 
 class ViewLine2 extends alfrid.View {
 	
-	constructor() {
+	constructor(mColor = [1, 1, 1], mLocalTransform=mat4.create()) {
 		super(vs, fs);
 
 		this.index = 0;
@@ -25,19 +25,33 @@ class ViewLine2 extends alfrid.View {
 		this.shader.uniform("uTime", "float", 0);
 		this.shader.uniform("ratio", "float", 0);
 		this.shader.uniform("alpha", "float", 1);
-		this.shader.uniform("thickness", "float", 1);
-		
+		this.shader.uniform("thickness", "float", .25);
+		this.shader.uniform("uColor", "vec3", mColor);
+		// this.shader.uniform("uPosition", "vec3", mPosition);
+		this.shader.uniform("uLocalTransform", "mat4", mLocalTransform);
 	}
 
 
 	_init() {
 	}
 
+	load(points) {
+
+		const newPoints = points.map( o => {
+			return [o[0], o[1], o[2]];
+		})
+
+		console.log('Loading points :', newPoints);
+
+
+		this.update(newPoints);
+	}
+
 
 	update(points) {
 		if(!this.mesh) {
 			this.mesh = new Line(points, (p)=>{
-				return p * 0.05;
+				return p * 0.02;
 			});
 		}
 
@@ -100,13 +114,14 @@ class ViewLine2 extends alfrid.View {
 			this._setupGamepad();
 		}
 
-		if(!this._rightHand) {
-			return;
-		}
+		// if(!this._rightHand) {
+		// 	return;
+		// }
 
 		if(!this.mesh) {
 			return;
 		}
+
 
 		this.shader.bind();
 		this.shader.uniform("aspect", "float", window.innerWidth / window.innerHeight);

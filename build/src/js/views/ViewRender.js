@@ -9,6 +9,9 @@ class ViewRender extends alfrid.View {
 	constructor() {
 		super(vs, fs);
 		this.time = Math.random() * 0xFFF;
+
+		this.mtxModel = mat4.create();
+		mat4.translate(this.mtxModel, this.mtxModel, vec3.fromValues(0, 0, -2));
 	}
 
 
@@ -53,7 +56,11 @@ class ViewRender extends alfrid.View {
 		this.shader.uniform('uViewport', 'vec2', [GL.width, GL.height]);
 		this.shader.uniform('percent', 'float', p);
 		this.shader.uniform('time', 'float', this.time);
+
+		GL.pushMatrix();
+		GL.rotate(this.mtxModel);
 		GL.draw(this.mesh);
+		GL.popMatrix();
 	}
 
 

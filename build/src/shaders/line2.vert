@@ -12,8 +12,10 @@ attribute vec3 aNormal;
 uniform mat4 uModelMatrix;
 uniform mat4 uViewMatrix;
 uniform mat4 uProjectionMatrix;
+uniform mat4 uLocalTransform;
 uniform float uTime;
 uniform int animated;
+uniform vec3 uPosition;
 
 
 uniform float thickness;
@@ -33,9 +35,9 @@ void main() {
 	vec2 aspectVec = vec2(aspect, 1.0);
 	mat4 projViewModel = uProjectionMatrix * uViewMatrix;//projection * view * model;
 
-	vec4 previousProjected = projViewModel * vec4(aPrevious.x, aPrevious.y, aPrevious.z, 1.0);
-	vec4 currentProjected = projViewModel * vec4(aVertexPosition.x, aVertexPosition.y, aVertexPosition.z, 1.0);
-	vec4 nextProjected = projViewModel * vec4(aNext.x, aNext.y, aNext.z, 1.0);
+	vec4 previousProjected = projViewModel * uLocalTransform * vec4(aPrevious, 1.0);
+	vec4 currentProjected = projViewModel * uLocalTransform * vec4(aVertexPosition, 1.0);
+	vec4 nextProjected = projViewModel * uLocalTransform * vec4(aNext, 1.0);
 
 	vPosition = currentProjected.xyz;
 	vNormal = aNormal;
