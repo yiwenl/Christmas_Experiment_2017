@@ -19,10 +19,11 @@ class SubsceneParticles {
 
 	_init() {
 		const numParticles = params.numParticles;
+		const type = GL.isMobile ? GL.HALF_FLOAT : GL.FLOAT;
 		const o = {
 			minFilter:GL.NEAREST,
 			magFilter:GL.NEAREST,
-			type:GL.HALF_FLOAT
+			type
 		};
 
 		this._fboCurrentPos = new alfrid.FrameBuffer(numParticles, numParticles, o);
@@ -61,16 +62,21 @@ class SubsceneParticles {
 	}
 
 
-	update() {
+	update(textureMap) {
 		this._fboTargetVel.bind();
 		GL.clear(0, 0, 0, 1);
-		this._vSim.render(this._fboCurrentVel.getTexture(), this._fboCurrentPos.getTexture(), this._fboExtra.getTexture());
+		this._vSim.render(
+			this._fboCurrentVel.getTexture(), 
+			this._fboCurrentPos.getTexture(), 
+			this._fboExtra.getTexture(),
+			textureMap
+			);
 		this._fboTargetVel.unbind();
 
 
 		//	Update position : bind target Position, render addVel with current position / target velocity;
 		this._fboTargetPos.bind();
-		GL.clear(0, 0, 0, 1);
+		GL.clear(0, 0, 0, 0);
 		this._vAddVel.render(this._fboCurrentPos.getTexture(), this._fboTargetVel.getTexture());
 		this._fboTargetPos.unbind();
 
@@ -86,8 +92,18 @@ class SubsceneParticles {
 	}
 
 
-	render() {
-		this._vRender.render(this._fboTargetPos.getTexture(), this._fboCurrentPos.getTexture(), 0, this._fboExtra.getTexture());
+	render(textureMap, mtxView, mtxProj, shadowMatrix, shadowMap) {
+		this._vRender.render(
+			this._fboTargetPos.getTexture(), 
+			this._fboCurrentPos.getTexture(), 
+			0, 
+			this._fboExtra.getTexture(),
+			textureMap,
+			mtxView, 
+			mtxProj, 
+			shadowMatrix, 
+			shadowMap
+			);
 	}
 }
 

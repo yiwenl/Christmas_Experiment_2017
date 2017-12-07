@@ -7,8 +7,13 @@ varying vec2 vTextureCoord;
 uniform sampler2D textureVel;
 uniform sampler2D texturePos;
 uniform sampler2D textureExtra;
+uniform sampler2D textureMap;
 uniform float time;
 uniform float maxRadius;
+
+uniform mat4 uModelMatrix;
+uniform mat4 uViewMatrix;
+uniform mat4 uProjectionMatrix;
 
 vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0;  }
 
@@ -113,25 +118,36 @@ vec3 curlNoise( vec3 p ){
 
 }
 
+
 void main(void) {
 	vec3 pos        = texture2D(texturePos, vTextureCoord).rgb;
+
+	vec4 screenPos = uProjectionMatrix * uViewMatrix * uModelMatrix * vec4(pos, 1.0);
+	vec2 uvScreen = screenPos.xy * .5 + .5;
+	float offset  = texture2D(textureMap, uvScreen).r;
+	float invertOffset  = 1.0 - offset;
+
+
 	vec3 vel        = texture2D(textureVel, vTextureCoord).rgb;
 	vec3 extra      = texture2D(textureExtra, vTextureCoord).rgb;
-	float posOffset = (0.5 + extra.r * 0.2) * .01;
-	vec3 acc        = curlNoise(pos * posOffset + time * .3);
-	
+	float posOffset = mix(extra.r, 1.0, .5) * (4.0 - invertOffset * 2.5);
+	vec3 acc        = curlNoise(pos * posOffset + time * .1);
+
+
+
 	
 
 	float dist = length(pos);
-	if(dist > maxRadius) {
-		float f = pow(2.0, dist - maxRadius);
+	float radius = maxRadius + invertOffset * 0.2;
+	if(dist > radius) {
+		float f = pow(2.0, dist - radius);
 		acc -= normalize(pos) * f;
 	}
 
-	vel += acc * .001;
+	vel += acc * .0005 * (1.0 + invertOffset);
 
 	const float decrease = .93;
-	vel *= decrease;
+	vel *= decrease * (1.0 - offset * 0.05);
 
 	gl_FragColor = vec4(vel, 1.0);
 }

@@ -58,7 +58,7 @@ class ViewSphere extends alfrid.View {
 	}
 
 
-	render() {
+	render(mtxProj) {
 		GL.gl.cullFace(GL.gl.FRONT);
 		GL.pushMatrix();
 
@@ -76,6 +76,7 @@ class ViewSphere extends alfrid.View {
 
 		this.shader.bind();
 		this.shader.uniform("uRange", "float", this.range);
+		this.shader.uniform("uLeftProj", "mat4", mtxProj);
 		GL.draw(this.mesh);
 		GL.popMatrix();
 		GL.gl.cullFace(GL.gl.BACK);

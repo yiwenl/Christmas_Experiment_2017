@@ -39,10 +39,7 @@ class ViewLine2 extends alfrid.View {
 
 		const newPoints = points.map( o => {
 			return [o[0], o[1], o[2]];
-		})
-
-		console.log('Loading points :', newPoints);
-
+		});
 
 		this.update(newPoints);
 	}

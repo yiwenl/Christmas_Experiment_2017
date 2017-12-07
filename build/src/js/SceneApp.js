@@ -20,7 +20,6 @@ class SceneApp extends Scene {
 		super();
 		
 		//	ORBITAL CONTROL
-		this.orbitalControl.rx.value = this.orbitalControl.ry.value = 0.1;
 		this.orbitalControl.radius.value = .1;
 		this.orbitalControl.lock(true);
 
@@ -33,21 +32,15 @@ class SceneApp extends Scene {
 		//	MODEL MATRIX
 		this._modelMatrix = mat4.create();
 
-		if(VRUtils.canPresent) {
-			// mat4.translate(this._modelMatrix, this._modelMatrix, vec3.fromValues(0, 0, -3));
-			GL.enable(GL.SCISSOR_TEST);
-			this.toRender();
-
-			this.resize();
-		}
+		
 
 
 		//	LIGHT
 		this._cameraLight = new alfrid.CameraOrtho();
-		const s = 8;
-		this._cameraLight.ortho(-s, s, -s, s, .5, 50);
-		this._cameraLight.lookAt([0, 10, 0], [0, 0, 0], [0, 0, -1]);
-		this._cameraLight.lookAt([0, 10, 5], [0, 0, 0]);
+		const s = .75;
+		this._cameraLight.ortho(-s, s, -s, s, .1, 15);
+		// this._cameraLight.lookAt([0, 10, 0], [0, 0, 0], [0, 0, -1]);
+		this._cameraLight.lookAt([0, 5, 2.5], [0, 0, -2]);
 		this._shadowMatrix = mat4.create();
 		this._biasMatrix = mat4.fromValues(
 			0.5, 0.0, 0.0, 0.0,
@@ -60,6 +53,17 @@ class SceneApp extends Scene {
 		mat4.multiply(this._shadowMatrix, this._biasMatrix, this._shadowMatrix);
 
 
+		this._mtxLeftView = mat4.create();
+		this._mtxLeftProj = mat4.create();
+
+		if(VRUtils.canPresent) {
+			// mat4.translate(this._modelMatrix, this._modelMatrix, vec3.fromValues(0, 0, -3));
+			GL.enable(GL.SCISSOR_TEST);
+			this.toRender();
+
+			this.resize();
+		}
+
 	}
 
 
@@ -69,7 +73,7 @@ class SceneApp extends Scene {
 	}
 
 	_initTextures() {
-		this._fboMap = new alfrid.FrameBuffer(1024, 1024, {minFilter:GL.LINEAR, magFilter:GL.LINEAR});
+		this._fboMap = new alfrid.FrameBuffer(GL.width, GL.height, {minFilter:GL.LINEAR, magFilter:GL.LINEAR});
 		this._fboShadow 	= new alfrid.FrameBuffer(1024, 1024, {minFilter:GL.LINEAR, magFilter:GL.LINEAR});
 	}
 
@@ -93,8 +97,8 @@ class SceneApp extends Scene {
 
 	_updateMap() {
 		this._fboMap.bind();
-		GL.clear(0, 0, 0, 1);
-		this._vSphere.render();
+		GL.clear(0, 0, 0, 0);
+		this._vSphere.render(this._mtxLeftProj);
 		this._fboMap.unbind();
 	}
 
@@ -102,21 +106,15 @@ class SceneApp extends Scene {
 		this._fboShadow.bind();
 		GL.clear(0, 0, 0, 0);
 		GL.setMatrices(this._cameraLight);
+		this._sceneParticles.render(this.textureMap, this._mtxLeftView, this._mtxLeftProj);
 		this._fboShadow.unbind();
 	}
 
 
 	render() {
-		// this._updateMap();
-		this._sceneParticles.update();
+		this._updateMap();
+		this._sceneParticles.update(this.textureMap);
 		this._updateShadowMap();
-
-		if(GL.isMobile && 0) {
-			GL.setMatrices(this.camera);
-			GL.rotate(this._modelMatrix);
-			this.renderScene();	
-			return;
-		}
 
 		if(!VRUtils.canPresent) { this.toRender(); }
 	}
@@ -131,6 +129,10 @@ class SceneApp extends Scene {
 			
 			const w2 = GL.width/2;
 			VRUtils.setCamera(this.cameraVR, 'left');
+
+			mat4.copy(this._mtxLeftView, this.cameraVR.matrix);
+			mat4.copy(this._mtxLeftProj, this.cameraVR.projection);
+
 			scissor(0, 0, w2, GL.height);
 			GL.setMatrices(this.cameraVR);
 			GL.rotate(this._modelMatrix);
@@ -161,14 +163,25 @@ class SceneApp extends Scene {
 				VRUtils.setCamera(this.cameraVR, 'left');
 				mat4.copy(this.cameraVR.projection, this.camera.projection);
 
+				mat4.copy(this._mtxLeftView, this.cameraVR.matrix);
+				mat4.copy(this._mtxLeftProj, this.cameraVR.projection);
+
 				scissor(0, 0, GL.width, GL.height);
 				GL.setMatrices(this.cameraVR);
 				GL.rotate(this._modelMatrix);
 				this.renderScene();
 			} else {
+				mat4.copy(this._mtxLeftView, this.camera.matrix);
+				mat4.copy(this._mtxLeftProj, this.camera.projection);
+
 				GL.setMatrices(this.camera);
 				GL.rotate(this._modelMatrix);
 				this.renderScene();	
+
+
+				let s = 200;
+				GL.viewport(0, 0, s, s);
+				this._bCopy.draw(this.shadowMap);
 			}
 			
 		}
@@ -178,10 +191,11 @@ class SceneApp extends Scene {
 	renderScene() {
 		GL.clear(0, 0, 0, 0);
 		GL.disable(GL.DEPTH_TEST);
-		this._vSphere.render();
+		this._vSphere.render(this._mtxLeftProj);
 		GL.enable(GL.DEPTH_TEST);
+		
 		this._vFloor.render();
-		this._sceneParticles.render();
+		this._sceneParticles.render(this.textureMap, this._mtxLeftView, this._mtxLeftProj, this._shadowMatrix, this.shadowMap);
 		this._sceneChars.render();
 		if(!GL.isMobile && VRUtils.hasVR) {
 			this._vPointer.render();	
@@ -192,11 +206,19 @@ class SceneApp extends Scene {
 
 	resize() {
 		let scale = VRUtils.canPresent ? 2 : 1;
-		if(GL.isMobile) scale = 1;
+		if(GL.isMobile) scale = window.devicePixelRatio;
 		GL.setSize(window.innerWidth * scale, window.innerHeight * scale);
 		this.camera.setAspectRatio(GL.aspectRatio);
 	}
 
+
+	get textureMap() {
+		return this._fboMap.getTexture();
+	}
+
+	get shadowMap() {
+		return this._fboShadow.getDepthTexture();
+	}
 }
 
 

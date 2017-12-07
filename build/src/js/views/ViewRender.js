@@ -3,11 +3,13 @@
 import alfrid, { GL } from 'alfrid';
 import vs from 'shaders/render.vert';
 import fs from 'shaders/render.frag';
+import fsShadow from 'shaders/renderShadow.frag';
 
 class ViewRender extends alfrid.View {
 	
 	constructor() {
 		super(vs, fs);
+		this.shaderShadow = new alfrid.GLShader(vs, fsShadow);
 		this.time = Math.random() * 0xFFF;
 
 		this.mtxModel = mat4.create();
@@ -40,22 +42,37 @@ class ViewRender extends alfrid.View {
 	}
 
 
-	render(textureCurr, textureNext, p, textureExtra) {
+	render(textureCurr, textureNext, p, textureExtra, textureMap, mtxView, mtxProj, mtxShadow, shadowMap) {
+		const shader = mtxShadow ? this.shaderShadow : this.shader;
 		this.time += 0.1;
-		this.shader.bind();
+		shader.bind();
 
-		this.shader.uniform('textureCurr', 'uniform1i', 0);
+		shader.uniform('textureCurr', 'uniform1i', 0);
 		textureCurr.bind(0);
 
-		this.shader.uniform('textureNext', 'uniform1i', 1);
+		shader.uniform('textureNext', 'uniform1i', 1);
 		textureNext.bind(1);
 
-		this.shader.uniform('textureExtra', 'uniform1i', 2);
+		shader.uniform('textureExtra', 'uniform1i', 2);
 		textureExtra.bind(2);
 
-		this.shader.uniform('uViewport', 'vec2', [GL.width, GL.height]);
-		this.shader.uniform('percent', 'float', p);
-		this.shader.uniform('time', 'float', this.time);
+		shader.uniform("textureMap", "uniform1i", 3);
+		textureMap.bind(3);
+
+		shader.uniform('uViewport', 'vec2', [GL.width, GL.height]);
+		shader.uniform('percent', 'float', p);
+		shader.uniform('time', 'float', this.time);
+
+		shader.uniform("uLeftView", "mat4", mtxView);
+		shader.uniform("uLeftProj", "mat4", mtxProj);
+
+		if(mtxShadow) {
+			shader.uniform("uShadowMatrix", "mat4", mtxShadow);
+			shader.uniform("textureShadow", "uniform1i", 4);
+			shadowMap.bind(4);
+		} else {
+			shader.uniform("uShadowMatrix", "mat4", mtxView);
+		}
 
 		GL.pushMatrix();
 		GL.rotate(this.mtxModel);
