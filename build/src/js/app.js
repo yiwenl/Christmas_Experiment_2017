@@ -70,7 +70,10 @@ function _initVR() {
 
 function _onVR(vrDisplay) {
 	if(vrDisplay != null && VRUtils.canPresent) {
-		document.body.classList.add('hasVR');
+		if(!GL.isMobile) {
+			document.body.classList.add('hasVR');	
+		}
+		
 		let btnVR = document.body.querySelector('#enterVr');
 		btnVR.addEventListener('click', ()=> {
 			VRUtils.present(GL.canvas, ()=> {

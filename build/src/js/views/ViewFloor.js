@@ -20,11 +20,16 @@ class ViewFloor extends alfrid.View {
 	}
 
 
-	render() {
+	render(shadowMatrix, shadowMap) {
 		this.shader.bind();
 		GL.pushMatrix();
 
 		GL.rotate(this.mtxModel);
+
+		this.shader.uniform("uShadowMatrix", "mat4", shadowMatrix);
+		this.shader.uniform("texureShadow", "uniform1i", 0);
+		shadowMap.bind(0);
+
 		GL.draw(this.mesh);
 
 		GL.popMatrix();
