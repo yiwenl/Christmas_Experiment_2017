@@ -28,6 +28,7 @@ class ViewSphere extends alfrid.View {
 			this.cameraSphere = new alfrid.Camera();
 			this.orbControlSphere = new alfrid.OrbitalControl(this.cameraSphere, window, .01);
 			const easing = 0.1;
+			this.orbControlSphere.ry.value = Math.PI * 0.25;
 			this.orbControlSphere.rx.easing = easing;
 			this.orbControlSphere.ry.easing = easing;
 			this.orbControlSphere.lockZoom(true);

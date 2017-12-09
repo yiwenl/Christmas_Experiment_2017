@@ -20,6 +20,9 @@ window.params = {
 	maxRadius: 0.15
 };
 
+window.iOS = !!navigator.platform && /iPad|iPhone|iPod/.test(navigator.platform);
+
+
 
 function _init() {
 
@@ -58,9 +61,6 @@ function _onImageLoaded(o) {
 
 	_initVR();
 
-	setTimeout(()=> {
-		document.body.classList.remove('isLoading');
-	}, 250);
 }
 
 
@@ -86,7 +86,29 @@ function _onVR(vrDisplay) {
 	}
 
 
+	_showTitle();
 	_init3D();
+
+	const btnStart = document.body.querySelector('.enter');
+	btnStart.addEventListener('click', (e)=> {
+		// this._init3D();
+		document.body.classList.remove('isShowingTitle');	
+
+		setTimeout(()=> {
+			document.body.classList.add('hasShownTitle');	
+		}, 250);
+	});
+}
+
+
+function _showTitle() {
+	setTimeout(()=> {
+		document.body.classList.remove('isLoading');	
+	}, 250);
+
+	setTimeout(()=> {
+		document.body.classList.add('isShowingTitle');	
+	}, 1500);
 }
 
 function _init3D() {

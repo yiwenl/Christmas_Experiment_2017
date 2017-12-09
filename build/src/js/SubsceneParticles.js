@@ -19,7 +19,7 @@ class SubsceneParticles {
 
 	_init() {
 		const numParticles = params.numParticles;
-		const type = GL.isMobile ? GL.HALF_FLOAT : GL.FLOAT;
+		const type = window.iOS ? GL.HALF_FLOAT : GL.FLOAT;
 		const o = {
 			minFilter:GL.NEAREST,
 			magFilter:GL.NEAREST,

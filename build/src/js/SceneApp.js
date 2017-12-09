@@ -177,11 +177,6 @@ class SceneApp extends Scene {
 				GL.setMatrices(this.camera);
 				GL.rotate(this._modelMatrix);
 				this.renderScene();	
-
-
-				let s = 200;
-				GL.viewport(0, 0, s, s);
-				this._bCopy.draw(this.shadowMap);
 			}
 			
 		}
@@ -192,11 +187,14 @@ class SceneApp extends Scene {
 		GL.clear(0, 0, 0, 0);
 		GL.disable(GL.DEPTH_TEST);
 		this._vSphere.render(this._mtxLeftProj);
+
 		GL.enable(GL.DEPTH_TEST);
-		
-		this._vFloor.render(this._shadowMatrix, this.shadowMap);
-		this._sceneParticles.render(this.textureMap, this._mtxLeftView, this._mtxLeftProj, this._shadowMatrix, this.shadowMap);
+
 		this._sceneChars.render();
+		this._sceneParticles.render(this.textureMap, this._mtxLeftView, this._mtxLeftProj, this._shadowMatrix, this.shadowMap);
+		this._vFloor.render(this._shadowMatrix, this.shadowMap);
+		
+		
 		if(!GL.isMobile && VRUtils.hasVR) {
 			this._vPointer.render();	
 		}
