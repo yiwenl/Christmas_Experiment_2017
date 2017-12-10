@@ -20,7 +20,7 @@ if(document.body) {
 
 window.params = {
 	numParticles:256 * 2,
-	maxRadius: 0.15
+	maxRadius: 0.5
 };
 
 window.iOS = !!navigator.platform && /iPad|iPhone|iPod/.test(navigator.platform);

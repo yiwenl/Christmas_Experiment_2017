@@ -7,8 +7,13 @@ varying vec2 vTextureCoord;
 uniform sampler2D textureVel;
 uniform sampler2D texturePos;
 uniform sampler2D textureExtra;
+uniform sampler2D textureMap;
 uniform float time;
 uniform float maxRadius;
+uniform mat4 uLeftView;
+uniform mat4 uLeftProj;
+uniform mat4 uModelMatrix;
+
 
 vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0;  }
 
@@ -114,25 +119,34 @@ vec3 curlNoise( vec3 p ){
 }
 
 void main(void) {
-	vec3 pos             = texture2D(texturePos, vTextureCoord).rgb;
-	vec3 vel             = texture2D(textureVel, vTextureCoord).rgb;
-	vec3 extra           = texture2D(textureExtra, vTextureCoord).rgb;
-	float posOffset      = mix(extra.r, 1.0, .75) * .1;
-	vec3 acc             = curlNoise(pos * posOffset + time * .5);
-	float speedOffset    = mix(extra.g, 1.0, .5);
+	vec3 pos           = texture2D(texturePos, vTextureCoord).rgb;
 	
-	float dist           = length(pos);
-	if(dist > maxRadius) {
-		float f          = pow(2.0, (dist - maxRadius) * 2.0) * 0.2;
-		acc              -= normalize(pos) * f;
+	vec4 screenPos     = uLeftProj * uLeftView * uModelMatrix * vec4(pos, 1.0);
+	vec2 uvScreen      = screenPos.xy * .5 + .5;
+	float offset       = texture2D(textureMap, uvScreen).r;
+	float invertOffset = 1.0 - offset;
+	
+	vec3 vel           = texture2D(textureVel, vTextureCoord).rgb;
+	vec3 extra         = texture2D(textureExtra, vTextureCoord).rgb;
+	float posOffset    = mix(extra.r, 1.0, .5) * (5.0 - invertOffset * 3.5) * 0.5;
+	vec3 acc           = curlNoise(pos * posOffset + time * .1);
+	float speedOffset  = mix(extra.g, 1.0, .5);
+	
+	vec3 center        = vec3(0.0, offset * 0.1, 0.0);
+	float dist         = distance(pos, center);
+	float radius       = maxRadius + invertOffset * 0.1;
+
+	if(dist > radius) {
+		float f        = pow(2.0, dist - radius);
+		acc            -= normalize(pos - center) * f;
 	}
+
+	vel                += acc * .0002 * (1.0 + invertOffset * 2.0) * speedOffset;
 	
-	vel                  += acc * .02 * speedOffset;
+	float decrease     = .96 + invertOffset * 0.02;
+	vel                *= decrease;
 	
-	const float decrease = .96;
-	vel                  *= decrease;
-	
-	pos                  += vel;
+	pos                += vel;
 
 	gl_FragData[0] = vec4(pos, 1.0);
 	gl_FragData[1] = vec4(vel, 1.0);

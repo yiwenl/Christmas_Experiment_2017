@@ -39,7 +39,7 @@ class SceneApp extends Scene {
 
 		//	LIGHT
 		this._cameraLight = new alfrid.CameraOrtho();
-		const s = .75;
+		const s = 3;
 		this._cameraLight.ortho(-s, s, -s, s, .1, 15);
 		// this._cameraLight.lookAt([0, 10, 0], [0, 0, 0], [0, 0, -1]);
 		this._cameraLight.lookAt([0, 5, 1.5], [0, 0, -2]);
@@ -59,7 +59,7 @@ class SceneApp extends Scene {
 		this._mtxLeftProj = mat4.create();
 
 		if(VRUtils.canPresent) {
-			// mat4.translate(this._modelMatrix, this._modelMatrix, vec3.fromValues(0, 0, -3));
+			mat4.translate(this._modelMatrix, this._modelMatrix, vec3.fromValues(0, 0, -5));
 			GL.enable(GL.SCISSOR_TEST);
 			this.toRender();
 
@@ -70,8 +70,12 @@ class SceneApp extends Scene {
 
 
 	_initSubScene() {
-		if(GL.isMobile) {
+		if(GL.isMobile || 1) {
 			this._sceneParticles = new SubsceneParticles(this);
+			console.log('Not using multi render target');
+			console.log('Not using multi render target');
+			console.log('Not using multi render target');
+			console.log('Not using multi render target');
 		} else {
 			this._sceneParticles = new SubsceneParticlesExtra(this);
 		}
@@ -120,7 +124,7 @@ class SceneApp extends Scene {
 
 	render() {
 		this._updateMap();
-		this._sceneParticles.update(this.textureMap);
+		this._sceneParticles.update(this.textureMap, this._mtxLeftView, this._mtxLeftProj);
 		this._updateShadowMap();
 
 		if(!VRUtils.canPresent) { this.toRender(); }
@@ -198,14 +202,11 @@ class SceneApp extends Scene {
 		this._vFloor.render(this._shadowMatrix, this.shadowMap);
 
 		this._sceneChars.render(this.textureMap, this._mtxLeftView, this._mtxLeftProj);
-		// this._sceneParticles.render(this.textureMap, this._mtxLeftView, this._mtxLeftProj, this._shadowMatrix, this.shadowMap);
-		
-		
+		this._sceneParticles.render(this.textureMap, this._mtxLeftView, this._mtxLeftProj, this._shadowMatrix, this.shadowMap);
 		
 		if(!GL.isMobile && VRUtils.hasVR) {
 			this._vPointer.render();	
 		}
-
 	}
 
 

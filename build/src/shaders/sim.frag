@@ -14,6 +14,8 @@ uniform float maxRadius;
 uniform mat4 uModelMatrix;
 uniform mat4 uViewMatrix;
 uniform mat4 uProjectionMatrix;
+uniform mat4 uLeftView;
+uniform mat4 uLeftProj;
 
 vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0;  }
 
@@ -122,16 +124,17 @@ vec3 curlNoise( vec3 p ){
 void main(void) {
 	vec3 pos        = texture2D(texturePos, vTextureCoord).rgb;
 
-	vec4 screenPos = uProjectionMatrix * uViewMatrix * uModelMatrix * vec4(pos, 1.0);
-	vec2 uvScreen = screenPos.xy * .5 + .5;
-	float offset  = texture2D(textureMap, uvScreen).r;
-	float invertOffset  = 1.0 - offset;
+	vec4 screenPos     = uLeftProj * uLeftView * uModelMatrix * vec4(pos, 1.0);
+	vec2 uvScreen      = screenPos.xy * .5 + .5;
+	float offset       = texture2D(textureMap, uvScreen).r;
+	float invertOffset = 1.0 - offset;
 
 
 	vec3 vel        = texture2D(textureVel, vTextureCoord).rgb;
 	vec3 extra      = texture2D(textureExtra, vTextureCoord).rgb;
-	float posOffset = mix(extra.r, 1.0, .5) * (5.0 - invertOffset * 3.5) * 0.5;
-	vec3 acc        = curlNoise(pos * posOffset + time * .1);
+	// float posOffset = mix(extra.r, 1.0, .5) * (5.0 - invertOffset * 3.5) * 0.5;
+	float posOffset = mix(extra.r, 1.0, 0.5) * .5;
+	vec3 acc        = curlNoise(pos * posOffset + time * .3);
 	float speedOffset = mix(extra.g, 1.0, .5);
 	
 	vec3 center = vec3(0.0, -offset * 0.25, 0.0);

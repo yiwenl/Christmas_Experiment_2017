@@ -23,7 +23,7 @@ class ViewSimMulti extends alfrid.View {
 	}
 
 
-	render(textureVel, texturePos, textureExtra, textureMap) {
+	render(textureVel, texturePos, textureExtra, textureMap, leftView, leftProj) {
 		this.shader.bind();
 		this.shader.uniform('time', 'float', alfrid.Scheduler.deltaTime);
 		this.shader.uniform('maxRadius', 'float', params.maxRadius);
@@ -31,6 +31,9 @@ class ViewSimMulti extends alfrid.View {
 		texturePos.bind(1);
 		textureExtra.bind(2);
 		textureMap.bind(3);
+
+		this.shader.uniform("uLeftView", "mat4", leftView);
+		this.shader.uniform("uLeftProj", "mat4", leftProj);
 
 
 		GL.draw(this.mesh);

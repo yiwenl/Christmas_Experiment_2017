@@ -59,17 +59,21 @@ class SubsceneParticles {
 		this._fboTargetPos.unbind();
 
 		GL.setMatrices(camera);
+
+		
 	}
 
 
-	update(textureMap) {
+	update(textureMap, mtxView, mtxProj) {
 		this._fboTargetVel.bind();
 		GL.clear(0, 0, 0, 1);
 		this._vSim.render(
 			this._fboCurrentVel.getTexture(), 
 			this._fboCurrentPos.getTexture(), 
 			this._fboExtra.getTexture(),
-			textureMap
+			textureMap,
+			mtxView, 
+			mtxProj
 			);
 		this._fboTargetVel.unbind();
 
@@ -103,7 +107,7 @@ class SubsceneParticles {
 			mtxProj, 
 			shadowMatrix, 
 			shadowMap
-			);
+		);
 	}
 }
 
