@@ -34,7 +34,7 @@ void main(void) {
 	gl_Position  = uProjectionMatrix * uViewMatrix * uModelMatrix * vec4(pos, 1.0);
 	vShadowCoord = uShadowMatrix * uModelMatrix * vec4(pos, 1.0);
 	
-	vec4 screenPos = uProjectionMatrix * uLeftView * uModelMatrix * vec4(pos, 1.0);
+	vec4 screenPos = uLeftProj * uLeftView * uModelMatrix * vec4(pos, 1.0);
 	screenPos /= screenPos.w;
 	vec2 uvScreen = screenPos.xy * .5 + .5;
 	float colorMap = texture2D(textureMap, uvScreen).r;

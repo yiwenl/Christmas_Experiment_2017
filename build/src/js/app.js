@@ -9,8 +9,7 @@ import Assets from './Assets';
 import VRUtils from './utils/VRUtils';
 import Sono from './libs/sono';
 
-
-console.log('Sono :', Sono);
+window.debug = true;
 
 if(document.body) {
 	_init();
@@ -62,6 +61,8 @@ function _onImageLoaded(o) {
 	window.assets = o;
 	const loader = document.body.querySelector('.Loading-Bar');
 	loader.style.width = '100%';
+
+	console.log('DEBUG :', window.debug);
 
 	_initVR();
 

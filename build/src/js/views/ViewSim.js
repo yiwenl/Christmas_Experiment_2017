@@ -8,7 +8,6 @@ class ViewSim extends alfrid.View {
 	
 	constructor() {
 		super(alfrid.ShaderLibs.bigTriangleVert, fs);
-		this.time = Math.random() * 0xFF;
 	}
 
 
@@ -25,9 +24,8 @@ class ViewSim extends alfrid.View {
 
 
 	render(textureVel, texturePos, textureExtra, textureMap) {
-		this.time += .01;
 		this.shader.bind();
-		this.shader.uniform('time', 'float', this.time);
+		this.shader.uniform('time', 'float', alfrid.Scheduler.deltaTime);
 		this.shader.uniform('maxRadius', 'float', params.maxRadius);
 		textureVel.bind(0);
 		texturePos.bind(1);

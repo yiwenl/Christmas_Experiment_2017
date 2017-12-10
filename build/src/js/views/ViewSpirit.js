@@ -2,7 +2,7 @@
 
 import alfrid, { GL } from 'alfrid';
 import Assets from '../Assets';
-import vs from 'shaders/basic.vert';
+import vs from 'shaders/spirit.vert';
 import fs from 'shaders/spirit.frag';
 
 class ViewSpirit extends alfrid.View {
@@ -23,7 +23,7 @@ class ViewSpirit extends alfrid.View {
 	}
 
 
-	render(textureMap) {
+	render(textureMap, mtxLeftView, mtxLeftProj) {
 		this.shader.bind();
 		this.shader.uniform("uPosition", "vec3", this.position);
 		this.shader.uniform("texture", "uniform1i", 0);
@@ -32,6 +32,9 @@ class ViewSpirit extends alfrid.View {
 		this.textureInner.bind(1);
 		this.shader.uniform("textureMap", "uniform1i", 2);
 		textureMap.bind(2);
+
+		this.shader.uniform("uLeftView", "mat4", mtxLeftView);
+		this.shader.uniform("uLeftProj", "mat4", mtxLeftProj);
 		GL.draw(this.mesh);
 	}
 

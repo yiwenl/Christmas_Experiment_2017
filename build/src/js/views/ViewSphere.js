@@ -25,8 +25,8 @@ class ViewSphere extends alfrid.View {
 			this._useGamepad = true;
 			this.mtx = mat4.create();
 		} else {
-			this.cameraSphere = new alfrid.CameraPerspective();
-			this.cameraSphere.setPerspective(Math.PI * 0.25, GL.aspectRatio, .1, 100);
+			this.cameraSphere = new alfrid.Camera();
+			// this.cameraSphere.setPerspective(Math.PI * 0.25, GL.aspectRatio, .1, 100);
 			this.orbControlSphere = new alfrid.OrbitalControl(this.cameraSphere, window, .01);
 			const easing = 0.1;
 			this.orbControlSphere.radius.value = .1;
@@ -68,9 +68,9 @@ class ViewSphere extends alfrid.View {
 		if(this._useGamepad) {
 
 			this._checkGamePad();
-			if(!this._gamepad) {
-				return;
-			}
+			// if(!this._gamepad) {
+			// 	return;
+			// }
 
 			GL.rotate(this.mtx);
 		} else {

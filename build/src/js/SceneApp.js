@@ -191,7 +191,7 @@ class SceneApp extends Scene {
 
 		GL.enable(GL.DEPTH_TEST);
 
-		this._sceneChars.render(this.textureMap);
+		this._sceneChars.render(this.textureMap, this._mtxLeftView, this._mtxLeftProj);
 		this._sceneParticles.render(this.textureMap, this._mtxLeftView, this._mtxLeftProj, this._shadowMatrix, this.shadowMap);
 		this._vFloor.render(this._shadowMatrix, this.shadowMap);	
 		
@@ -206,8 +206,14 @@ class SceneApp extends Scene {
 	resize() {
 		let scale = VRUtils.canPresent ? 2 : 1;
 		if(GL.isMobile) scale = window.devicePixelRatio;
+
+		// const ratio = 1920/1080;
+		// const w = Math.max(window.innerWidth * scale, 1920);
 		GL.setSize(window.innerWidth * scale, window.innerHeight * scale);
+		// GL.setSize(w, w/ratio);
 		this.camera.setAspectRatio(GL.aspectRatio);
+
+		console.log('Canvas Size :', GL.width, GL.height);
 	}
 
 

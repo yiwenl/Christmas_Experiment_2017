@@ -54,10 +54,10 @@ class SubsceneChars {
 		this._vSpirit = new ViewSpirit();
 	}
 
-	render(textureMap) {
+	render(textureMap, mtxLeftView, mtxLeftProj) {
 		this._vChar.render();
 		// this._vSmallChar.render();
-		this._vSpirit.render(textureMap);
+		this._vSpirit.render(textureMap, mtxLeftView, mtxLeftProj);
 	}
 }
 

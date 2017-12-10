@@ -10,8 +10,8 @@ uniform float uRange;
 
 void main(void) {
 	// const float r = .02;
-	float d = smoothstep(uRange, -uRange, vPosition.z);
-	// float d = smoothstep(uRange, -uRange, vPosition.x);
+	// float d = smoothstep(uRange, -uRange, vPosition.z);
+	float d = smoothstep(uRange, -uRange, vPosition.x);
 	gl_FragColor = vec4(vec3(d), 1.0);
 }
 
