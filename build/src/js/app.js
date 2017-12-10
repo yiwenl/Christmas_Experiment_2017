@@ -91,12 +91,12 @@ function _onVR(vrDisplay) {
 
 	const btnStart = document.body.querySelector('.enter');
 	btnStart.addEventListener('click', (e)=> {
-		// this._init3D();
-		document.body.classList.remove('isShowingTitle');	
-
+		document.body.classList.add('isClosingTitle');
 		setTimeout(()=> {
 			document.body.classList.add('hasShownTitle');	
-		}, 250);
+			document.body.classList.remove('isClosingTitle');	
+			document.body.classList.remove('isShowingTitle');	
+		}, 1000);
 	});
 }
 
@@ -104,11 +104,8 @@ function _onVR(vrDisplay) {
 function _showTitle() {
 	setTimeout(()=> {
 		document.body.classList.remove('isLoading');	
-	}, 250);
-
-	setTimeout(()=> {
 		document.body.classList.add('isShowingTitle');	
-	}, 1500);
+	}, 250);
 }
 
 function _init3D() {
