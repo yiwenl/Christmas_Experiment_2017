@@ -188,12 +188,12 @@ class SceneApp extends Scene {
 		GL.clear(0, 0, 0, 0);
 		GL.disable(GL.DEPTH_TEST);
 		this._vSphere.render(this._mtxLeftProj);
-
 		GL.enable(GL.DEPTH_TEST);
+		this._vFloor.render(this._shadowMatrix, this.shadowMap);
 
 		this._sceneChars.render(this.textureMap, this._mtxLeftView, this._mtxLeftProj);
-		this._sceneParticles.render(this.textureMap, this._mtxLeftView, this._mtxLeftProj, this._shadowMatrix, this.shadowMap);
-		this._vFloor.render(this._shadowMatrix, this.shadowMap);	
+		// this._sceneParticles.render(this.textureMap, this._mtxLeftView, this._mtxLeftProj, this._shadowMatrix, this.shadowMap);
+		
 		
 		
 		if(!GL.isMobile && VRUtils.hasVR) {

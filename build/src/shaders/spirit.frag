@@ -20,6 +20,9 @@ void main(void) {
     vec2 uvScreen = screenCoord.xy * .5 + .5;
     float colorMap = texture2D(textureMap, uvScreen).r;
 
+    float a = smoothstep(0.0, 0.2, vTextureCoord.y);
+
 
     gl_FragColor = mix(color, colorInner, colorMap);
+    gl_FragColor.a *= a;
 }
