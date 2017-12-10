@@ -130,11 +130,9 @@ void main(void) {
 
 	vec3 vel        = texture2D(textureVel, vTextureCoord).rgb;
 	vec3 extra      = texture2D(textureExtra, vTextureCoord).rgb;
-	float posOffset = mix(extra.r, 1.0, .5) * (4.0 - invertOffset * 2.5);
-	vec3 acc        = curlNoise(pos * posOffset + time * .1);
-
-
-
+	float posOffset = mix(extra.r, 1.0, .25) * (5.0 - invertOffset * 3.5);
+	vec3 acc        = curlNoise(pos * posOffset + time * .3);
+	float speedOffset = mix(extra.g, 1.0, .5);
 	
 
 	float dist = length(pos);
@@ -144,10 +142,10 @@ void main(void) {
 		acc -= normalize(pos) * f;
 	}
 
-	vel += acc * .0005 * (1.0 + invertOffset);
+	vel += acc * .0001 * (1.0 + invertOffset * 2.0) * speedOffset;
 
-	const float decrease = .93;
-	vel *= decrease * (1.0 - offset * 0.05);
+	float decrease = .96 + invertOffset * 0.02;
+	vel *= decrease;
 
 	gl_FragColor = vec4(vel, 1.0);
 }

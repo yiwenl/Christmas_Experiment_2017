@@ -139,7 +139,7 @@ void main(void) {
 	vec3 extra           = texture2D(textureExtra, vTextureCoord).rgb;
 	vec3 life            = texture2D(textureLife, vTextureCoord).rgb;
 	vec3 orgPos          = texture2D(textureOrgPos, vTextureCoord).rgb;
-	float posOffset      = mix(extra.r, 1.0, .75) * .1;
+	float posOffset      = mix(extra.r, 1.0, .75) * .2;
 	vec3 acc             = curlNoise(pos * posOffset + time * .5);
 	acc.z += 1.0;
 	float speedOffset    = mix(extra.g, 1.0, .5);
@@ -150,18 +150,18 @@ void main(void) {
 		acc              -= normalize(pos) * f;
 	}
 	
-	vel                  += acc * .0015 * speedOffset * mix(invertScreen, 1.0, .2);
+	vel                  += acc * .0015 * speedOffset * mix(invertScreen, 1.0, .5);
 	
 	const float decrease = .986;
 	vel                  *= decrease;
 	
 	pos                  += vel;
 
-	life.x -= mix(life.y, 1.0, .25) * 0.02;
-	if(life.x < 0.0) {
-		pos = orgPos;
-		life.x = 1.0;
-	}
+	// life.x -= mix(life.y, 1.0, .25) * 0.02;
+	// if(life.x < 0.0) {
+	// 	pos = orgPos;
+	// 	life.x = 1.0;
+	// }
 
 	gl_FragData[0] = vec4(pos, 1.0);
 	gl_FragData[1] = vec4(vel, 1.0);

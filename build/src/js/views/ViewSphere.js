@@ -11,7 +11,7 @@ class ViewSphere extends alfrid.View {
 	constructor() {
 		super(vs, fs);
 
-		this.range = 0.005;
+		this.range = 0.002;
 	}
 
 
@@ -25,10 +25,11 @@ class ViewSphere extends alfrid.View {
 			this._useGamepad = true;
 			this.mtx = mat4.create();
 		} else {
-			this.cameraSphere = new alfrid.Camera();
+			this.cameraSphere = new alfrid.CameraPerspective();
+			this.cameraSphere.setPerspective(Math.PI * 0.25, GL.aspectRatio, .1, 100);
 			this.orbControlSphere = new alfrid.OrbitalControl(this.cameraSphere, window, .01);
 			const easing = 0.1;
-			this.orbControlSphere.ry.value = Math.PI * 0.25;
+			this.orbControlSphere.radius.value = .1;
 			this.orbControlSphere.rx.easing = easing;
 			this.orbControlSphere.ry.easing = easing;
 			this.orbControlSphere.lockZoom(true);

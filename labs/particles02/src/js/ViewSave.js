@@ -26,27 +26,27 @@ class ViewSave extends alfrid.View {
 		let range = 3;
 		const m = mat4.create();
 
-		// const getPos = () => {
-		// 	const r = Math.sqrt(Math.random()) * params.maxRadius;
-		// 	const v = vec3.fromValues(r, 0, 0);
-		// 	mat4.identity(m);
-		// 	mat4.rotateX(m, m, Math.random() * Math.PI * 2);
-		// 	mat4.rotateY(m, m, Math.random() * Math.PI * 2);
-		// 	mat4.rotateZ(m, m, Math.random() * Math.PI * 2);
-
-		// 	vec3.transformMat4(v, v, m);
-		// 	return v;
-		// }
-
-
 		const getPos = () => {
+			const r = Math.sqrt(Math.random()) * params.maxRadius;
+			const v = vec3.fromValues(r, 0, 0);
+			mat4.identity(m);
+			mat4.rotateX(m, m, Math.random() * Math.PI * 2);
+			mat4.rotateY(m, m, Math.random() * Math.PI * 2);
+			mat4.rotateZ(m, m, Math.random() * Math.PI * 2);
 
-			let rx = 1;
-			let ry = 2.75;
-			let rz = 1;
-
-			return [random(-rx, rx), random(-ry, ry) - 0.5, random(-rz, rz)];
+			vec3.transformMat4(v, v, m);
+			return v;
 		}
+
+
+		// const getPos = () => {
+
+		// 	let rx = 1;
+		// 	let ry = 2.75;
+		// 	let rz = 1;
+
+		// 	return [random(-rx, rx), random(-ry, ry) - 0.5, random(-rz, rz)];
+		// }
 
 		for(let j = 0; j < numParticles; j++) {
 			for(let i = 0; i < numParticles; i++) {

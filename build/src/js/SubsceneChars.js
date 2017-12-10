@@ -2,6 +2,7 @@
 
 import alfrid, { GL } from 'alfrid';
 import ViewChar from './views/ViewChar';
+import ViewSmallChar from './views/ViewSmallChar';
 
 class SubsceneChars {
 	constructor(parentScene) {
@@ -47,10 +48,12 @@ class SubsceneChars {
 		];
 
 		this._vChar = new ViewChar(chars, matrices);
+		this._vSmallChar = new ViewSmallChar();
 	}
 
-	render() {
+	render(textureMap) {
 		this._vChar.render();
+		// this._vSmallChar.render();
 	}
 }
 

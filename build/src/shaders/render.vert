@@ -22,7 +22,7 @@ varying vec4 vColor;
 varying vec3 vNormal;
 varying vec4 vShadowCoord;
 
-const float radius = 0.002;
+const float radius = 0.001;
 
 void main(void) {
 	vec2 uv      = aVertexPosition.xy;
@@ -42,7 +42,7 @@ void main(void) {
 
 	float g 	 = mix(extra.b, 1.0, .75);
 	vec3 color 	 = vec3(g);
-	vec3 invertColor = 1.0 - vec3(g);
+	vec3 invertColor = vec3( mix((1.0 - g), 1.0, .15));
 	color = mix(color, invertColor, colorMap);
 	vColor       = vec4(color, 1.0);
 

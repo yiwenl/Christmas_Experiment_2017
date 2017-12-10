@@ -13,3 +13,6 @@ div.style.zIndex = '999';
 const stats = new Stats();
 document.body.appendChild(stats.domElement);
 alfrid.Scheduler.addEF(()=>stats.update());
+
+
+window.debug = true;

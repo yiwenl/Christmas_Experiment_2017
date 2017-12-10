@@ -22,6 +22,7 @@ class SceneApp extends Scene {
 		//	ORBITAL CONTROL
 		this.orbitalControl.radius.value = .1;
 		this.orbitalControl.lock(true);
+		this.camera.setPerspective(Math.PI * 0.25, GL.aspectRatio, .1, 100);
 
 
 		this._initSubScene();
@@ -40,7 +41,7 @@ class SceneApp extends Scene {
 		const s = .75;
 		this._cameraLight.ortho(-s, s, -s, s, .1, 15);
 		// this._cameraLight.lookAt([0, 10, 0], [0, 0, 0], [0, 0, -1]);
-		this._cameraLight.lookAt([0, 5, 2.5], [0, 0, -2]);
+		this._cameraLight.lookAt([0, 5, 1.5], [0, 0, -2]);
 		this._shadowMatrix = mat4.create();
 		this._biasMatrix = mat4.fromValues(
 			0.5, 0.0, 0.0, 0.0,
@@ -190,9 +191,13 @@ class SceneApp extends Scene {
 
 		GL.enable(GL.DEPTH_TEST);
 
-		this._sceneChars.render();
+		this._sceneChars.render(this.textureMap);
 		this._sceneParticles.render(this.textureMap, this._mtxLeftView, this._mtxLeftProj, this._shadowMatrix, this.shadowMap);
-		this._vFloor.render(this._shadowMatrix, this.shadowMap);
+
+		// if(!GL.isMobile) {
+			this._vFloor.render(this._shadowMatrix, this.shadowMap);	
+		// }
+		
 		
 		
 		if(!GL.isMobile && VRUtils.hasVR) {

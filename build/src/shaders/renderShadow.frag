@@ -18,11 +18,11 @@ void main(void) {
 	if(depth < shadowCoord.z - bias) {
 		visibility = 0.0;
 	}
-	visibility = mix(visibility, 1.0, .5);
+	visibility = mix(visibility, 1.0, .75);
 
 	vec4 color = vColor;
 
-	color *= visibility;
+	color.rgb *= visibility;
 
 
     gl_FragColor = color;
