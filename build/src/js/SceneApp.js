@@ -35,28 +35,29 @@ class SceneApp extends Scene {
 		this._modelMatrix = mat4.create();
 
 		//	Touch detect
+		let z = -4;
 
 		this._mesh = alfrid.Geom.sphere(params.maxRadius + 0.5, 12, false);
-		
+		this.shader = new alfrid.GLShader();
 		this._hit = vec3.fromValues(999, 999, 999);
-		// this._touch = new TouchDetector(this._mesh, this.camera);
-		// this._touch.on('onHit', (e)=> {
-		// 	vec3.copy(this._hit, e.detail.hit);
-		// });
+		this._touch = new TouchDetector(this._mesh, this.camera);
+		this._touch.on('onHit', (e)=> {
+			vec3.copy(this._hit, e.detail.hit);
+		});
 
-		// this._touch.on('onUp', ()=> {
-		// 	vec3.set(this._hit, 999, 999, 999);
-		// });
-		// mat4.translate(this._touch.mtxModel, this._touch.mtxModel, vec3.fromValues(0, 0, z));
+		this._touch.on('onUp', ()=> {
+			vec3.set(this._hit, 999, 999, 999);
+		});
+		mat4.translate(this._touch.mtxModel, this._touch.mtxModel, vec3.fromValues(0, 0.5, z));
 
 
 		//	LIGHT
 		this._cameraLight = new alfrid.CameraOrtho();
-		const s = 2;
+		const s = 3;
 		this._cameraLight.ortho(-s, s, -s, s, .1, 15);
-		let z = -4;
+		
 		this._cameraLight.lookAt([0, 10, z], [0, 0, z], [0, 0, -1]);
-		// this._cameraLight.lookAt([0, 5, ], [0, 0, -2]);
+		this._cameraLight.lookAt([0, 8, z], [0, 0, z-2]);
 		this._shadowMatrix = mat4.create();
 		this._biasMatrix = mat4.fromValues(
 			0.5, 0.0, 0.0, 0.0,
@@ -88,28 +89,24 @@ class SceneApp extends Scene {
 
 	_initSubScene() {
 		this._sceneParticles = new SubsceneParticles(this);
-		this._sceneChars = new SubsceneChars(this);
+		this._sceneChars     = new SubsceneChars(this);
 	}
 
 	_initTextures() {
-		this._fboMap = new alfrid.FrameBuffer(GL.width, GL.height, {minFilter:GL.LINEAR, magFilter:GL.LINEAR});
-		this._fboShadow 	= new alfrid.FrameBuffer(1024, 1024, {minFilter:GL.LINEAR, magFilter:GL.LINEAR});
+		this._fboMap    = new alfrid.FrameBuffer(GL.width, GL.height, {minFilter:GL.LINEAR, magFilter:GL.LINEAR});
+		this._fboShadow = new alfrid.FrameBuffer(1024, 1024, {minFilter:GL.LINEAR, magFilter:GL.LINEAR});
 	}
 
 
 	_initViews() {
 		console.log('init views');
 
-		this._bCopy = new alfrid.BatchCopy();
-		this._bBall = new alfrid.BatchBall();
-
-		this._vSphere = new ViewSphere();
-		this._vFloor = new ViewFloor();
+		this._bCopy    = new alfrid.BatchCopy();
+		this._bBall    = new alfrid.BatchBall();
+		
+		this._vSphere  = new ViewSphere();
+		this._vFloor   = new ViewFloor();
 		this._vPointer = new ViewPointer();
-
-		//	load drawings
-		this._lines = [];
-
 	}
 
 

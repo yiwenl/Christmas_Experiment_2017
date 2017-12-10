@@ -9,6 +9,8 @@ import Assets from './Assets';
 import VRUtils from './utils/VRUtils';
 import Sono from './libs/sono';
 
+window.debug = true;
+
 if(document.body) {
 	_init();
 } else {
@@ -117,6 +119,10 @@ function _enterExp() {
 	const sound = Sono.createSound('./assets/audio/background.mp3');
 	sound.loop = true;
 	sound.play();
+
+	if(window.debug) {
+		sound.volume = 0.001;
+	}
 
 	window.addEventListener('mousedown', onDown);
 	window.addEventListener('touchstart', onDown);

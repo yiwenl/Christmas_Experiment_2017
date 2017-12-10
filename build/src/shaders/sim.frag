@@ -168,20 +168,25 @@ void main(void) {
 	}
 
 	//	hitting
-	// dist = distance(pos, uHit);
-	// float maxHitRadius = 1.0;
-	// if(dist < maxHitRadius) {
-	// 	vec3 axis = normalize(pos - center);
-	// 	vec3 dir = normalize(pos - uHit);
-	// 	dir = rotate(dir, axis, PI * 0.75);
-	// 	float f = smoothstep(maxHitRadius, 0.0, dist);
-	// 	acc += dir * f;
-	// }
+	vec3 adjustPos = (uModelMatrix * vec4(pos, 1.0)).xyz;
+	dist = distance(adjustPos, uHit);
+	float maxHitRadius = 0.75;
+	if(dist < maxHitRadius) {
+		vec3 axis = normalize(pos - center);
+		vec3 dir = normalize(uHit - adjustPos);
+		acc += dir * pow(2.0, dist/maxHitRadius) * 0.25;
+		dir = rotate(dir, axis, PI * 0.25);
+		float f = smoothstep(maxHitRadius, 0.0, dist);
+		acc += dir * f * 5.0;
+
+	}
 
 	vel                += acc * .0001 * (1.0 + invertOffset * 5.0) * speedOffset;
 	
 	float decrease     = .98 - invertOffset * 0.02;
 	vel                *= decrease;
+
+	
 	
 
 	gl_FragColor = vec4(vel, 1.0);

@@ -40,11 +40,8 @@ class ViewSim extends alfrid.View {
 
 		this.shader.uniform("uLeftView", "mat4", leftView);
 		this.shader.uniform("uLeftProj", "mat4", leftProj);
-
 		this.shader.uniform("uHit", "vec3", mHit);
 
-		
-		
 		GL.draw(this.mesh);
 		GL.popMatrix();
 	}

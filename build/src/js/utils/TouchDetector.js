@@ -71,7 +71,6 @@ class TouchDetector extends EventDispatcher {
 			return;
 		}
 
-
 		const mx = (this._lastPos.x / window.innerWidth) * 2.0 - 1.0;
 		const my = - (this._lastPos.y / window.innerHeight) * 2.0 + 1.0;
 
