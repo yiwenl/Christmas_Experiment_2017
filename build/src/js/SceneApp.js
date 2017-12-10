@@ -4,6 +4,7 @@ import alfrid, { Scene, GL } from 'alfrid';
 import Assets from './Assets';
 import VRUtils from './utils/VRUtils';
 import SubsceneParticles from './SubsceneParticles';
+import SubsceneParticlesExtra from './SubsceneParticlesExtra';
 import SubsceneChars from './SubsceneChars';
 import ViewSphere from './views/ViewSphere';
 import ViewFloor from './views/ViewFloor';
@@ -69,7 +70,12 @@ class SceneApp extends Scene {
 
 
 	_initSubScene() {
-		this._sceneParticles = new SubsceneParticles(this);
+		if(GL.isMobile) {
+			this._sceneParticles = new SubsceneParticles(this);
+		} else {
+			this._sceneParticles = new SubsceneParticlesExtra(this);
+		}
+		
 		this._sceneChars = new SubsceneChars(this);
 	}
 
