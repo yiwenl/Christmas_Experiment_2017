@@ -77,6 +77,8 @@ h1, h2, h3, h4, text, p {
   .hasVR.hasShownTitle #enterVr {
     opacity: 1;
     display: block; }
+  .present-vr #enterVr {
+    display: none; }
 
 .enter {
   position: fixed;
@@ -137,9 +139,20 @@ h1, h2, h3, h4, text, p {
 .description {
   position: fixed;
   z-index: 10;
-  bottom: 10%;
+  bottom: 7%;
   width: 100%;
+  font-size: 14px;
   text-align: center;
-  letter-spacing: 2px; }
+  letter-spacing: 3px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 1s ease-out .5s; }
+  .hasShownTitle .description {
+    opacity: 1; }
+  .hasInteracted .description {
+    transition: opacity 1s ease-out;
+    opacity: 0; }
+  .hasVR .description {
+    display: none; }
 
 /*# sourceMappingURL=main.css.map*/

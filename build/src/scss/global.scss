@@ -109,6 +109,10 @@ h1,h2,h3,h4,text,p {
 		display: block;
 
 	}
+
+	.present-vr & {
+		display: none;
+	}
 }
 
 
@@ -220,5 +224,9 @@ h1,h2,h3,h4,text,p {
 	.hasInteracted & {
 		transition: opacity 1s ease-out;
 		opacity: 0;
+	}
+
+	.hasVR & {
+		display: none;
 	}
 }
