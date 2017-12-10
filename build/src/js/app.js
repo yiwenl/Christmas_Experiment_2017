@@ -19,7 +19,7 @@ if(document.body) {
 
 
 window.params = {
-	numParticles:256 * 2,
+	numParticles:256 ,
 	maxRadius: 0.5
 };
 

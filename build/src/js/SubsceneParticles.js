@@ -59,8 +59,6 @@ class SubsceneParticles {
 		this._fboTargetPos.unbind();
 
 		GL.setMatrices(camera);
-
-		
 	}
 
 

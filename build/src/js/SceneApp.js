@@ -4,7 +4,6 @@ import alfrid, { Scene, GL } from 'alfrid';
 import Assets from './Assets';
 import VRUtils from './utils/VRUtils';
 import SubsceneParticles from './SubsceneParticles';
-import SubsceneParticlesExtra from './SubsceneParticlesExtra';
 import SubsceneChars from './SubsceneChars';
 import ViewSphere from './views/ViewSphere';
 import ViewFloor from './views/ViewFloor';
@@ -70,16 +69,7 @@ class SceneApp extends Scene {
 
 
 	_initSubScene() {
-		if(GL.isMobile || 1) {
-			this._sceneParticles = new SubsceneParticles(this);
-			console.log('Not using multi render target');
-			console.log('Not using multi render target');
-			console.log('Not using multi render target');
-			console.log('Not using multi render target');
-		} else {
-			this._sceneParticles = new SubsceneParticlesExtra(this);
-		}
-		
+		this._sceneParticles = new SubsceneParticles(this);
 		this._sceneChars = new SubsceneChars(this);
 	}
 

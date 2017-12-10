@@ -140,7 +140,7 @@ void main(void) {
 	vec3 acc        = curlNoise(pos * posOffset + time * .3);
 
 
-	vel += acc * (.01 + invertMap * 0.02);
+	vel += acc * (.01 + invertMap * 0.02) * 0.5;
 
 	float dist = length(pos);
 	float radius = maxRadius + invertMap * 1.5;

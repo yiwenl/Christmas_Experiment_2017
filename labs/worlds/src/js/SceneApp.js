@@ -28,11 +28,31 @@ class SceneApp extends Scene {
 
 
 		//	VR CAMERA
-		this.cameraVR = new alfrid.Camera();
+		this.cameraVRLeft = new alfrid.Camera();
+		this.cameraVRRight = new alfrid.Camera();
 
 		//	MODEL MATRIX
 		this._modelMatrix = mat4.create();
 		console.log('Has VR :', VRUtils.hasVR);
+
+
+		//	LIGHT
+		this._cameraLight = new alfrid.CameraOrtho();
+		const s = 10;
+		this._cameraLight.ortho(-s, s, -s, s, .1, 50);
+		let z = -14;
+		this._cameraLight.lookAt([0, 10, z], [0, 0, z], [0, 0, -1]);
+		// this._cameraLight.lookAt([0, 5, 1.5], [0, 0, 0]);
+		this._shadowMatrix = mat4.create();
+		this._biasMatrix = mat4.fromValues(
+			0.5, 0.0, 0.0, 0.0,
+			0.0, 0.5, 0.0, 0.0,
+			0.0, 0.0, 0.5, 0.0,
+			0.5, 0.5, 0.5, 1.0
+		);
+
+		mat4.multiply(this._shadowMatrix, this._cameraLight.projection, this._cameraLight.viewMatrix);
+		mat4.multiply(this._shadowMatrix, this._biasMatrix, this._shadowMatrix);
 
 		if(VRUtils.canPresent) {
 			mat4.translate(this._modelMatrix, this._modelMatrix, vec3.fromValues(0, 0, -3));
@@ -58,6 +78,8 @@ class SceneApp extends Scene {
 
 		this._fboCurrent  	= new alfrid.FrameBuffer(numParticles, numParticles, o, true);
 		this._fboTarget  	= new alfrid.FrameBuffer(numParticles, numParticles, o, true);
+
+		this._fboShadow = new alfrid.FrameBuffer(1024, 1024, {minFilter:GL.LINEAR, magFilter:GL.LINEAR});
 	}
 
 
@@ -94,8 +116,8 @@ class SceneApp extends Scene {
 	updateFbo() {
 		this._fboTarget.bind();
 		GL.clear(0, 0, 0, 1);
-		VRUtils.setCamera(this.cameraVR, 'left');
-		GL.setMatrices(this.cameraVR);
+		VRUtils.setCamera(this.cameraVRLeft, 'left');
+		GL.setMatrices(this.cameraVRLeft);
 		GL.rotate(this._modelMatrix);
 		this._vSim.render(this._fboCurrent.getTexture(1), this._fboCurrent.getTexture(0), this._fboCurrent.getTexture(2), this._fboMap.getTexture());
 		this._fboTarget.unbind();
@@ -105,6 +127,16 @@ class SceneApp extends Scene {
 		this._fboCurrent = this._fboTarget;
 		this._fboTarget  = tmp;
 
+	}
+
+	updateShadowMap() {
+		let p = this._count / params.skipCount;
+
+		this._fboShadow.bind();
+		GL.clear(1, 0, 0, 1);
+		GL.setMatrices(this._cameraLight);
+		this._vRender.renderShadow(this._fboTarget.getTexture(0), this._fboCurrent.getTexture(0), p, this._fboCurrent.getTexture(2), this._fboTarget.getTexture(3));
+		this._fboShadow.unbind();
 	}
 
 	_updateMap() {
@@ -124,6 +156,8 @@ class SceneApp extends Scene {
 			this.updateFbo();
 		}
 
+		this.updateShadowMap();
+
 		if(!VRUtils.canPresent) { this.toRender(); }
 	}
 
@@ -136,16 +170,16 @@ class SceneApp extends Scene {
 		if(VRUtils.isPresenting) {
 			
 			const w2 = GL.width/2;
-			VRUtils.setCamera(this.cameraVR, 'left');
+			VRUtils.setCamera(this.cameraVRLeft, 'left');
 			scissor(0, 0, w2, GL.height);
-			GL.setMatrices(this.cameraVR);
+			GL.setMatrices(this.cameraVRLeft);
 			GL.rotate(this._modelMatrix);
 			this.renderScene();
 
 
-			VRUtils.setCamera(this.cameraVR, 'right');
+			VRUtils.setCamera(this.cameraVRRight, 'right');
 			scissor(w2, 0, w2, GL.height);
-			GL.setMatrices(this.cameraVR);
+			GL.setMatrices(this.cameraVRRight);
 			GL.rotate(this._modelMatrix);
 			this.renderScene();
 
@@ -155,21 +189,22 @@ class SceneApp extends Scene {
 			scissor(0, 0, GL.width, GL.height);
 
 			GL.clear(0, 0, 0, 0);
-			mat4.copy(this.cameraVR.projection, this.camera.projection);
+			mat4.copy(this.cameraVRLeft.projection, this.camera.projection);
 
-			GL.setMatrices(this.cameraVR);
+			GL.setMatrices(this.cameraVRLeft);
 			GL.rotate(this._modelMatrix);
 			this.renderScene();
+
 
 
 		} else {
 
 			if(VRUtils.canPresent) {
-				VRUtils.setCamera(this.cameraVR, 'left');
-				mat4.copy(this.cameraVR.projection, this.camera.projection);
+				VRUtils.setCamera(this.cameraVRLeft, 'left');
+				mat4.copy(this.cameraVRLeft.projection, this.camera.projection);
 
 				scissor(0, 0, GL.width, GL.height);
-				GL.setMatrices(this.cameraVR);
+				GL.setMatrices(this.cameraVRLeft);
 				GL.rotate(this._modelMatrix);
 				this.renderScene();
 			} else {
@@ -179,6 +214,11 @@ class SceneApp extends Scene {
 			}
 			
 		}
+
+		let s = 500;
+		GL.viewport(0, 0, s, s);
+		GL.disable(GL.DEPTH_TEST);
+		GL.enable(GL.DEPTH_TEST);
 	}
 
 
@@ -188,7 +228,16 @@ class SceneApp extends Scene {
 		this._vSphere.render();
 
 		let p = this._count / params.skipCount;
-		this._vRender.render(this._fboTarget.getTexture(0), this._fboCurrent.getTexture(0), p, this._fboCurrent.getTexture(2), this._fboTarget.getTexture(3));
+		this._vRender.render(
+			this._fboTarget.getTexture(0), 
+			this._fboCurrent.getTexture(0), 
+			p, 
+			this._fboCurrent.getTexture(2), 
+			this._fboTarget.getTexture(3),
+			this._shadowMatrix,
+			this._fboShadow.getDepthTexture()
+
+			);
 		this._vPointer.render();
 	}
 
