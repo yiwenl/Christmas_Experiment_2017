@@ -73,7 +73,11 @@ class SceneApp extends Scene {
 		const o = {
 			minFilter:GL.NEAREST,
 			magFilter:GL.NEAREST,
-			type:GL.FLOAT
+			type:GL.FLOAT,
+			mipmap:false,
+			premultiplyAlpha:true,
+			wrapS:GL.MIRRORED_REPEAT,
+			wrapT:GL.MIRRORED_REPEAT
 		};
 
 		this._fboCurrent  	= new alfrid.FrameBuffer(numParticles, numParticles, o, true);

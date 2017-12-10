@@ -7,15 +7,11 @@ html, body {
 
 	overflow:hidden;
 	position: static;
-	
-	$gradient0: #333333;
-	$gradient1: #000000;
 
-	/* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#6d6d6d+0,000000+100 */
-	background: $gradient0; /* Old browsers */
-	background: -moz-radial-gradient(center, ellipse cover,  $gradient0 0%, $gradient1 100%); /* FF3.6-15 */
-	background: -webkit-radial-gradient(center, ellipse cover,  $gradient0 0%,$gradient1 100%); /* Chrome10-25,Safari5.1-6 */
-	background: radial-gradient(ellipse at center,  $gradient0 0%,$gradient1 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+	background:white;
+
+	background: url(../../assets/img-css/bg.jpg);
+	background-size: cover;
 }
 
 html {
@@ -38,11 +34,11 @@ h1,h2,h3,h4,text,p {
 	position: absolute;
 	user-select:none;
 
-	opacity: 1;
-	transition: opacity .5s ease-out .25s;
+	opacity: 0;
+	transition: opacity .5s ease-out;
 
-	.isLoading & {
-		opacity: 0;
+	.hasShownTitle & {
+		opacity: 1;
 	}
 }
 
@@ -54,12 +50,13 @@ h1,h2,h3,h4,text,p {
 	top: calc(50% - 50px);
 	text-align: center;
 	letter-spacing: 11px;
-	color:white;
+	color:black;
+	pointer-events: none;
 
 	opacity: 0;
 	transition:opacity .5s ease-out, letter-spacing .5s ease-out;
 
-	.isLoading & {
+	.isPlaying & {
 		letter-spacing: 10px;
 		opacity: 1;
 	}
@@ -71,7 +68,7 @@ h1,h2,h3,h4,text,p {
 	width: 0%;
 	height:1px;
 	top:50%;
-	background:rgba(255, 255, 255, .5);
+	background:rgba(0, 0, 0, 1);
 	opacity: 0;
 
 	transition:width .5s ease-out, opacity .5s ease-out;
@@ -84,14 +81,119 @@ h1,h2,h3,h4,text,p {
 
 #enterVr {
 	position: fixed;
-	bottom: 10%;
-	left:50%;
+	bottom: 80px;
+	left: 50%;
 
-	width: 100px;
-	margin-left: -50px;
-	z-index: 9999;
+	$ratio:200/100;
+	$width:100px;
+	$height:$width/$ratio;
+	width: $width;
+	height: $height;
+	margin-left: -$width/2;
+	z-index: 99998;
+	border:none;
+	
+	background: url(../../assets/img-css/logo_vr.png);
+	background-size: cover;
+	outline:none;
 
-	.present-vr & {
-		display: none;
+	cursor: pointer;
+
+	opacity: 0;
+	display: none;
+
+	transition: opacity .5s ease-out;
+
+	.hasVR.hasShownTitle & {
+		opacity: 1;
+		display: block;
+
 	}
+}
+
+
+.enter {
+	position: fixed;
+	/*top: eval(50% + 100px);*/
+	top: 60%;
+	left: 50%;
+
+	$ratio:196/59;
+	$width:100px;
+	$height:$width/$ratio;
+	width: $width;
+	height: $height;
+	margin-left: -$width/2;
+	z-index: 99999;
+	border:none;
+	
+	background: url(../../assets/img-css/btnStart.png);
+	background-size: cover;
+	outline:none;
+
+	cursor: pointer;
+
+	opacity: 0;
+	display: block;
+	pointer-events: none;
+
+	.isShowingTitle & {
+		$duration: 1.5s;
+		transition: opacity $duration ease-out 2s, transform $duration ease-out 2s;
+		opacity: 1;
+		pointer-events: auto;
+		transform: translateY(-10px);
+	}
+
+	.isClosingTitle & {
+		$duration: 1s;
+		transition:opacity $duration ease-out, transform $duration ease-out;
+		opacity: 0;
+		transform: translateY(0px);
+	}
+}
+
+
+.title-container {
+	position: fixed;
+	z-index: 10;
+	width: 100%;
+	height: 100%;
+	align-items: center;
+	justify-content: center;
+	display:flex;
+	opacity: 0;
+
+	.isShowingTitle & {
+		transition:opacity .75s ease-out 1s;
+		opacity: 1;
+	}
+
+	.isClosingTitle & {
+		transition:opacity .5s ease-out;
+		opacity: 0;
+	}
+}
+
+
+.title {
+	$ratio:1033/44;
+
+	$width:516.5px;
+	$height:$width/$ratio;
+	width: $width;
+	height: $height;
+	background: url(../../assets/img-css/title.png);
+	background-size: cover;
+
+	@media only screen 
+	and (max-device-width : 667px) { 
+		$width:80%;
+		$height:$width/$ratio;
+		width: $width;
+		height: $height;
+		background: url(../../assets/img-css/title.png);
+		background-size: 100% 100%;
+		margin-top: -50px;
+	} 
 }

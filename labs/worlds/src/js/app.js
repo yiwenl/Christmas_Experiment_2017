@@ -6,6 +6,8 @@ import assets from './asset-list';
 import Assets from './Assets';
 import VRUtils from './utils/VRUtils';
 
+window.debug = true;
+
 if(document.body) {
 	_init();
 } else {
@@ -70,7 +72,10 @@ function _initVR() {
 
 function _onVR(vrDisplay) {
 	if(vrDisplay != null && VRUtils.canPresent) {
-		document.body.classList.add('hasVR');
+		if(!GL.isMobile) {
+			document.body.classList.add('hasVR');	
+		}
+		
 		let btnVR = document.body.querySelector('#enterVr');
 		btnVR.addEventListener('click', ()=> {
 			VRUtils.present(GL.canvas, ()=> {
@@ -83,7 +88,44 @@ function _onVR(vrDisplay) {
 	}
 
 
+	
 	_init3D();
+
+	const btnStart = document.body.querySelector('.enter');
+	btnStart.addEventListener('click', (e)=> {
+		document.body.classList.add('isClosingTitle');
+		setTimeout(_enterExp, 1000);
+	});
+
+
+	if(window.debug) {
+		_enterExp();
+	} else {
+		_showTitle();
+	}
+
+}
+
+
+function _enterExp() {
+	document.body.classList.add('hasShownTitle');	
+	document.body.classList.remove('isClosingTitle');	
+	document.body.classList.remove('isShowingTitle');	
+	document.body.classList.remove('isLoading');
+
+	const sound = Sono.createSound('./assets/audio/background.mp3');
+	sound.loop = true;
+	if(window.debug) {
+		sound.volume = 0.01;
+	}
+	sound.play();
+}
+
+function _showTitle() {
+	setTimeout(()=> {
+		document.body.classList.remove('isLoading');
+		document.body.classList.add('isShowingTitle');	
+	}, 250);
 }
 
 function _init3D() {
@@ -93,8 +135,14 @@ function _init3D() {
 	document.body.appendChild(canvas);
 
 	//	INIT 3D TOOL
-	GL.init(canvas, {ignoreWebgl2:true});
+	GL.init(canvas, {ignoreWebgl2:true, alpha:false});
 	GL.enableAlphaBlending();
+
+	if(GL.isMobile) {
+		params.numParticles = 128;
+	}
+
+	console.log('Num Particles : ', params.numParticles);
 
 	//	INIT ASSETS
 	Assets.init();
@@ -104,4 +152,6 @@ function _init3D() {
 
 	//	CREATE SCENE
 	scene = new SceneApp();
+
+	//	STATS
 }

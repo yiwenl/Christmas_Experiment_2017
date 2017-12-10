@@ -11,7 +11,7 @@ class ViewRender extends alfrid.View {
 		super(vs, fs);
 		this.shaderShadow = new alfrid.GLShader(vs, fsShadow);
 		this.mtx = mat4.create();
-		mat4.translate(this.mtx, this.mtx, vec3.fromValues(0, 0, -14));
+		mat4.translate(this.mtx, this.mtx, vec3.fromValues(0, 0, -4));
 		this.time = Math.random() * 0xFFF;
 	}
 

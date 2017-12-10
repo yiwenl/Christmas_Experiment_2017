@@ -13,7 +13,7 @@ class ViewRender extends alfrid.View {
 		this.time = Math.random() * 0xFFF;
 
 		this.mtxModel = mat4.create();
-		mat4.translate(this.mtxModel, this.mtxModel, vec3.fromValues(0, 0, -14));
+		mat4.translate(this.mtxModel, this.mtxModel, vec3.fromValues(0, 0, -4));
 	}
 
 
