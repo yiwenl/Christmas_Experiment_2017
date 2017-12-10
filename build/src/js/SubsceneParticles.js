@@ -62,7 +62,7 @@ class SubsceneParticles {
 	}
 
 
-	update(textureMap, mtxView, mtxProj) {
+	update(textureMap, mtxView, mtxProj, mHit) {
 		this._fboTargetVel.bind();
 		GL.clear(0, 0, 0, 1);
 		this._vSim.render(
@@ -71,7 +71,8 @@ class SubsceneParticles {
 			this._fboExtra.getTexture(),
 			textureMap,
 			mtxView, 
-			mtxProj
+			mtxProj,
+			mHit
 			);
 		this._fboTargetVel.unbind();
 

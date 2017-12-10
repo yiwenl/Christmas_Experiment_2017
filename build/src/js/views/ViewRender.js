@@ -11,9 +11,6 @@ class ViewRender extends alfrid.View {
 		super(vs, fs);
 		this.shaderShadow = new alfrid.GLShader(vs, fsShadow);
 		this.time = Math.random() * 0xFFF;
-
-		this.mtxModel = mat4.create();
-		mat4.translate(this.mtxModel, this.mtxModel, vec3.fromValues(0, 0, -4));
 	}
 
 
@@ -74,10 +71,7 @@ class ViewRender extends alfrid.View {
 			shader.uniform("uShadowMatrix", "mat4", mtxView);
 		}
 
-		// GL.pushMatrix();
-		// GL.rotate(this.mtxModel);
 		GL.draw(this.mesh);
-		// GL.popMatrix();
 	}
 
 

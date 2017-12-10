@@ -9,8 +9,6 @@ import Assets from './Assets';
 import VRUtils from './utils/VRUtils';
 import Sono from './libs/sono';
 
-window.debug = true;
-
 if(document.body) {
 	_init();
 } else {
@@ -118,10 +116,10 @@ function _enterExp() {
 
 	const sound = Sono.createSound('./assets/audio/background.mp3');
 	sound.loop = true;
-	if(window.debug) {
-		sound.volume = 0.01;
-	}
 	sound.play();
+
+	window.addEventListener('mousedown', onDown);
+	window.addEventListener('touchstart', onDown);
 }
 
 function _showTitle() {
@@ -145,8 +143,6 @@ function _init3D() {
 		params.numParticles = 128;
 	}
 
-	console.log('Num Particles : ', params.numParticles);
-
 	//	INIT ASSETS
 	Assets.init();
 
@@ -155,6 +151,10 @@ function _init3D() {
 
 	//	CREATE SCENE
 	scene = new SceneApp();
+	
+}
 
-	//	STATS
+
+function onDown() {
+	document.body.classList.add('hasInteracted');	
 }

@@ -26,7 +26,7 @@ class ViewSim extends alfrid.View {
 	}
 
 
-	render(textureVel, texturePos, textureExtra, textureMap, leftView, leftProj) {
+	render(textureVel, texturePos, textureExtra, textureMap, leftView, leftProj, mHit) {
 		GL.pushMatrix();
 		GL.rotate(this.mtxModel);
 		this.shader.bind();
@@ -40,6 +40,8 @@ class ViewSim extends alfrid.View {
 
 		this.shader.uniform("uLeftView", "mat4", leftView);
 		this.shader.uniform("uLeftProj", "mat4", leftProj);
+
+		this.shader.uniform("uHit", "vec3", mHit);
 
 		
 		

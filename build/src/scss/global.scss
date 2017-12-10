@@ -197,3 +197,28 @@ h1,h2,h3,h4,text,p {
 		margin-top: -50px;
 	} 
 }
+
+
+.description {
+	position: fixed;
+	z-index: 10;
+	bottom: 7%;
+	width:100%;
+	font-size: 14px;
+	text-align: center;
+	letter-spacing: 3px;
+
+	opacity: 0;
+	pointer-events: none;
+
+	transition: opacity 1s ease-out .5s;
+
+	.hasShownTitle & {
+		opacity: 1;
+	}
+
+	.hasInteracted & {
+		transition: opacity 1s ease-out;
+		opacity: 0;
+	}
+}

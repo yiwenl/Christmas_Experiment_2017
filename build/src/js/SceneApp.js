@@ -9,6 +9,7 @@ import ViewSphere from './views/ViewSphere';
 import ViewFloor from './views/ViewFloor';
 import ViewLine from './views/ViewLine';
 import ViewPointer from './views/ViewPointer';
+import TouchDetector from './utils/TouchDetector';
 
 const scissor = function(x, y, w, h) {
 	GL.scissor(x, y, w, h);
@@ -33,7 +34,20 @@ class SceneApp extends Scene {
 		//	MODEL MATRIX
 		this._modelMatrix = mat4.create();
 
+		//	Touch detect
+
+		this._mesh = alfrid.Geom.sphere(params.maxRadius + 0.5, 12, false);
 		
+		this._hit = vec3.fromValues(999, 999, 999);
+		// this._touch = new TouchDetector(this._mesh, this.camera);
+		// this._touch.on('onHit', (e)=> {
+		// 	vec3.copy(this._hit, e.detail.hit);
+		// });
+
+		// this._touch.on('onUp', ()=> {
+		// 	vec3.set(this._hit, 999, 999, 999);
+		// });
+		// mat4.translate(this._touch.mtxModel, this._touch.mtxModel, vec3.fromValues(0, 0, z));
 
 
 		//	LIGHT
@@ -64,8 +78,10 @@ class SceneApp extends Scene {
 			GL.enable(GL.SCISSOR_TEST);
 			this.toRender();
 
-			this.resize();
+			
 		}
+
+		this.resize();
 
 	}
 
@@ -85,8 +101,7 @@ class SceneApp extends Scene {
 		console.log('init views');
 
 		this._bCopy = new alfrid.BatchCopy();
-		this._bAxis = new alfrid.BatchAxis();
-		this._bDots = new alfrid.BatchDotsPlane();
+		this._bBall = new alfrid.BatchBall();
 
 		this._vSphere = new ViewSphere();
 		this._vFloor = new ViewFloor();
@@ -117,7 +132,7 @@ class SceneApp extends Scene {
 
 	render() {
 		this._updateMap();
-		this._sceneParticles.update(this.textureMap, this._mtxLeftView, this._mtxLeftProj);
+		this._sceneParticles.update(this.textureMap, this._mtxLeftView, this._mtxLeftProj, this._hit);
 		this._updateShadowMap();
 
 		if(!VRUtils.canPresent) { this.toRender(); }
@@ -197,9 +212,9 @@ class SceneApp extends Scene {
 		this._vSphere.render(this._mtxLeftProj);
 		GL.enable(GL.DEPTH_TEST);
 		this._vFloor.render(this._shadowMatrix, this.shadowMap);
-
-		this._sceneChars.render(this.textureMap, this._mtxLeftView, this._mtxLeftProj);
+		
 		this._sceneParticles.render(this.textureMap, this._mtxLeftView, this._mtxLeftProj, this._shadowMatrix, this.shadowMap);
+		this._sceneChars.render(this.textureMap, this._mtxLeftView, this._mtxLeftProj);
 		
 		if(!GL.isMobile && VRUtils.hasVR) {
 			this._vPointer.render();	
@@ -210,11 +225,7 @@ class SceneApp extends Scene {
 	resize() {
 		let scale = VRUtils.canPresent ? 2 : 1;
 		if(GL.isMobile) scale = window.devicePixelRatio;
-
-		// const ratio = 1920/1080;
-		// const w = Math.max(window.innerWidth * scale, 1920);
 		GL.setSize(window.innerWidth * scale, window.innerHeight * scale);
-		// GL.setSize(w, w/ratio);
 		this.camera.setAspectRatio(GL.aspectRatio);
 
 		console.log('Canvas Size :', GL.width, GL.height);
