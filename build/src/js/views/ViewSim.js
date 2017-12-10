@@ -8,6 +8,9 @@ class ViewSim extends alfrid.View {
 	
 	constructor() {
 		super(alfrid.ShaderLibs.bigTriangleVert, fs);
+
+		this.mtxModel = mat4.create();
+		mat4.translate(this.mtxModel, this.mtxModel, vec3.fromValues(0, 0, -4));
 	}
 
 
@@ -24,6 +27,8 @@ class ViewSim extends alfrid.View {
 
 
 	render(textureVel, texturePos, textureExtra, textureMap, leftView, leftProj) {
+		GL.pushMatrix();
+		GL.rotate(this.mtxModel);
 		this.shader.bind();
 		this.shader.uniform('time', 'float', alfrid.Scheduler.deltaTime);
 		this.shader.uniform('maxRadius', 'float', params.maxRadius);
@@ -36,7 +41,10 @@ class ViewSim extends alfrid.View {
 		this.shader.uniform("uLeftView", "mat4", leftView);
 		this.shader.uniform("uLeftProj", "mat4", leftProj);
 
+		
+		
 		GL.draw(this.mesh);
+		GL.popMatrix();
 	}
 
 

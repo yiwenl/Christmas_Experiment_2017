@@ -74,10 +74,10 @@ class ViewRender extends alfrid.View {
 			shader.uniform("uShadowMatrix", "mat4", mtxView);
 		}
 
-		GL.pushMatrix();
-		GL.rotate(this.mtxModel);
+		// GL.pushMatrix();
+		// GL.rotate(this.mtxModel);
 		GL.draw(this.mesh);
-		GL.popMatrix();
+		// GL.popMatrix();
 	}
 
 

@@ -14,13 +14,13 @@ class ViewSpirit extends alfrid.View {
 
 	_init() {
 		const ratio = 532/800;
-		const s = 1.75;
+		const s = 2.;
 		const h = s/ratio;
 		this.mesh = alfrid.Geom.plane(s, h, 1);
 
 		this.texture = Assets.get('spirit');
 		this.textureInner = Assets.get('spiritInner');
-		this.position = [0, h/4-.1, -5];
+		this.position = [0, h/4, -3];
 	}
 
 

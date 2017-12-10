@@ -120,39 +120,37 @@ vec3 curlNoise( vec3 p ){
 
 }
 
-vec4 getScreenPos(vec3 pos) {
-	return uProjectionMatrix * uViewMatrix * uModelMatrix * vec4(pos, 1.0);
-}
 
 
 void main(void) {
-	vec3 pos        = texture2D(texturePos, vTextureCoord).rgb;
+	vec3 pos           = texture2D(texturePos, vTextureCoord).rgb;
+	
+	vec4 screenPos     = uLeftProj * uLeftView * uModelMatrix * vec4(pos, 1.0);
+	screenPos          /= screenPos.w;
+	vec2 uvScreen      = screenPos.xy * .5 + .5;
+	float offset       = texture2D(textureMap, uvScreen).r;
+	float invertOffset = 1.0 - offset;
+	
+	vec3 vel           = texture2D(textureVel, vTextureCoord).rgb;
+	vec3 extra         = texture2D(textureExtra, vTextureCoord).rgb;
+	float posOffset    = mix(extra.r, 1.0, .5) * (5.0 - invertOffset * 3.5) * 0.5;
+	vec3 acc           = curlNoise(pos * posOffset + time * .1);
+	float speedOffset  = mix(extra.g, 1.0, .5);
+	
+	vec3 center        = vec3(0.0, invertOffset * 0.3 + 0.2, 0.0);
+	float dist         = distance(pos, center);
+	float radius       = maxRadius + invertOffset * 0.5;
 
-	vec4 screenPos = getScreenPos(pos);
-	screenPos /= screenPos.w;
-	vec2 screenUV = screenPos.xy * .5 + .5;
-
-	float map 		= texture2D(textureMap, screenUV).r;
-	float invertMap = 1.0 - map;
-
-	vec3 vel        = texture2D(textureVel, vTextureCoord).rgb;
-	vec3 extra      = texture2D(textureExtra, vTextureCoord).rgb;
-	float posOffset = mix(extra.r, 1.0, 0.5) * .25;
-	vec3 acc        = curlNoise(pos * posOffset + time * .3);
-
-
-	vel += acc * (.01 + invertMap * 0.02) * 0.5;
-
-	float dist = length(pos);
-	float radius = maxRadius + invertMap * 1.5;
 	if(dist > radius) {
-		float f = pow(2.0, (dist - radius) * 2.0) * 0.001;
-		vel -= normalize(pos) * f;
+		float f        = pow(2.0, (dist - radius) * 2.0);
+		acc            -= normalize(pos - center) * f * (1.0 + invertOffset * 2.0);
 	}
 
-	float decrease = .92 - map * 0.02;
-	vel *= decrease;
-
+	vel                += acc * .0001 * (1.0 + invertOffset * 5.0) * speedOffset;
+	
+	float decrease     = .98 - invertOffset * 0.02;
+	vel                *= decrease;
+	
 
 	gl_FragColor = vec4(vel, 1.0);
 }

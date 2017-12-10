@@ -38,10 +38,11 @@ class SceneApp extends Scene {
 
 		//	LIGHT
 		this._cameraLight = new alfrid.CameraOrtho();
-		const s = 3;
+		const s = 2;
 		this._cameraLight.ortho(-s, s, -s, s, .1, 15);
-		// this._cameraLight.lookAt([0, 10, 0], [0, 0, 0], [0, 0, -1]);
-		this._cameraLight.lookAt([0, 5, 1.5], [0, 0, -2]);
+		let z = -4;
+		this._cameraLight.lookAt([0, 10, z], [0, 0, z], [0, 0, -1]);
+		// this._cameraLight.lookAt([0, 5, ], [0, 0, -2]);
 		this._shadowMatrix = mat4.create();
 		this._biasMatrix = mat4.fromValues(
 			0.5, 0.0, 0.0, 0.0,
@@ -56,9 +57,10 @@ class SceneApp extends Scene {
 
 		this._mtxLeftView = mat4.create();
 		this._mtxLeftProj = mat4.create();
+		mat4.translate(this._modelMatrix, this._modelMatrix, vec3.fromValues(0, 0, z));
 
 		if(VRUtils.canPresent) {
-			mat4.translate(this._modelMatrix, this._modelMatrix, vec3.fromValues(0, 0, -5));
+			
 			GL.enable(GL.SCISSOR_TEST);
 			this.toRender();
 
@@ -105,8 +107,9 @@ class SceneApp extends Scene {
 
 	_updateShadowMap() {
 		this._fboShadow.bind();
-		GL.clear(0, 0, 0, 0);
+		GL.clear(1, 0, 0, 1);
 		GL.setMatrices(this._cameraLight);
+		GL.rotate(this._modelMatrix);
 		this._sceneParticles.render(this.textureMap, this._mtxLeftView, this._mtxLeftProj);
 		this._fboShadow.unbind();
 	}
@@ -181,6 +184,10 @@ class SceneApp extends Scene {
 			}
 			
 		}
+
+		let s = 300;
+		GL.viewport(0, 0, s, s);
+		// this._bCopy.draw(this._fboMap.getTexture());
 	}
 
 
