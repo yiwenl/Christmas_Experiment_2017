@@ -193,11 +193,7 @@ class SceneApp extends Scene {
 
 		this._sceneChars.render(this.textureMap);
 		this._sceneParticles.render(this.textureMap, this._mtxLeftView, this._mtxLeftProj, this._shadowMatrix, this.shadowMap);
-
-		// if(!GL.isMobile) {
-			this._vFloor.render(this._shadowMatrix, this.shadowMap);	
-		// }
-		
+		this._vFloor.render(this._shadowMatrix, this.shadowMap);	
 		
 		
 		if(!GL.isMobile && VRUtils.hasVR) {

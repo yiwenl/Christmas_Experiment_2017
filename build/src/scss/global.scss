@@ -185,4 +185,15 @@ h1,h2,h3,h4,text,p {
 	height: $height;
 	background: url(../../assets/img-css/title.png);
 	background-size: cover;
+
+	@media only screen 
+	and (max-device-width : 667px) { 
+		$width:80%;
+		$height:$width/$ratio;
+		width: $width;
+		height: $height;
+		background: url(../../assets/img-css/title.png);
+		background-size: 100% 100%;
+		margin-top: -50px;
+	} 
 }

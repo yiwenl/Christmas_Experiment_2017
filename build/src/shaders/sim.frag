@@ -134,15 +134,15 @@ void main(void) {
 	vec3 acc        = curlNoise(pos * posOffset + time * .3);
 	float speedOffset = mix(extra.g, 1.0, .5);
 	
-
-	float dist = length(pos);
+	vec3 center = vec3(0.0, -offset * 0.25, 0.0);
+	float dist = distance(pos, center);
 	float radius = maxRadius + invertOffset * 0.2;
 	if(dist > radius) {
 		float f = pow(2.0, dist - radius);
-		acc -= normalize(pos) * f;
+		acc -= normalize(pos - center) * f;
 	}
 
-	vel += acc * .0001 * (1.0 + invertOffset * 2.0) * speedOffset;
+	vel += acc * .001 * (1.0 + invertOffset * 2.0) * speedOffset;
 
 	float decrease = .96 + invertOffset * 0.02;
 	vel *= decrease;

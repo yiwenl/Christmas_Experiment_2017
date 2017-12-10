@@ -27,7 +27,7 @@ h1, h2, h3, h4, text, p {
   position: absolute;
   user-select: none;
   opacity: 0;
-  transition: opacity .5s ease-out .25s; }
+  transition: opacity .5s ease-out; }
   .hasShownTitle .Main-Canvas {
     opacity: 1; }
 
@@ -39,6 +39,7 @@ h1, h2, h3, h4, text, p {
   text-align: center;
   letter-spacing: 11px;
   color: black;
+  pointer-events: none;
   opacity: 0;
   transition: opacity .5s ease-out, letter-spacing .5s ease-out; }
   .isPlaying .Message {
@@ -64,7 +65,7 @@ h1, h2, h3, h4, text, p {
   width: 100px;
   height: 50px;
   margin-left: -50px;
-  z-index: 99999;
+  z-index: 99998;
   border: none;
   background: url(../../assets/img/logo_vr.png);
   background-size: cover;
@@ -73,8 +74,64 @@ h1, h2, h3, h4, text, p {
   opacity: 0;
   display: none;
   transition: opacity .5s ease-out; }
-  .hasVR #enterVr {
+  .hasVR.hasShownTitle #enterVr {
     opacity: 1;
     display: block; }
+
+.enter {
+  position: fixed;
+  /*top: eval(50% + 100px);*/
+  top: 60%;
+  left: 50%;
+  width: 100px;
+  height: 30.10204px;
+  margin-left: -50px;
+  z-index: 99999;
+  border: none;
+  background: url(../../assets/img-css/btnStart.png);
+  background-size: cover;
+  outline: none;
+  cursor: pointer;
+  opacity: 0;
+  display: block;
+  pointer-events: none; }
+  .isShowingTitle .enter {
+    transition: opacity 1.5s ease-out 2s, transform 1.5s ease-out 2s;
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(-10px); }
+  .isClosingTitle .enter {
+    transition: opacity 1s ease-out, transform 1s ease-out;
+    opacity: 0;
+    transform: translateY(0px); }
+
+.title-container {
+  position: fixed;
+  z-index: 10;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: 0; }
+  .isShowingTitle .title-container {
+    transition: opacity .75s ease-out 1s;
+    opacity: 1; }
+  .isClosingTitle .title-container {
+    transition: opacity .5s ease-out;
+    opacity: 0; }
+
+.title {
+  width: 516.5px;
+  height: 22px;
+  background: url(../../assets/img-css/title.png);
+  background-size: cover; }
+  @media only screen and (max-device-width: 667px) {
+    .title {
+      width: 80%;
+      height: 3.40755%;
+      background: url(../../assets/img-css/title.png);
+      background-size: 100% 100%;
+      margin-top: -50px; } }
 
 /*# sourceMappingURL=main.css.map*/
