@@ -9,7 +9,6 @@ import Assets from './Assets';
 import VRUtils from './utils/VRUtils';
 import Sono from './libs/sono';
 
-// window.debug = true;
 
 if(document.body) {
 	_init();

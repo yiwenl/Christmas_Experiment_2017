@@ -235,6 +235,7 @@ class SceneApp extends Scene {
 		
 		this._sceneParticles.render(this.textureMap, this._mtxLeftView, this._mtxLeftProj, this._shadowMatrix, this.shadowMap);
 		this._sceneChars.render(this.textureMap, this._mtxLeftView, this._mtxLeftProj);
+		GL.rotate(this._modelMatrix);
 		
 		if(!GL.isMobile && VRUtils.hasVR) {
 			this._vPointer.render();	

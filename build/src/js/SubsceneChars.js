@@ -4,6 +4,7 @@ import alfrid, { GL } from 'alfrid';
 import ViewChar from './views/ViewChar';
 // import ViewSmallChar from './views/ViewSmallChar';
 import ViewSpirit from './views/ViewSpirit';
+import ViewFace from './views/ViewFace';
 
 class SubsceneChars {
 	constructor(parentScene) {
@@ -52,12 +53,14 @@ class SubsceneChars {
 
 		this._vChar = new ViewChar(chars, matrices);
 		this._vSpirit = new ViewSpirit();
+		this._vFace = new ViewFace();
 	}
 
 	render(textureMap, mtxLeftView, mtxLeftProj) {
 		this._vChar.render();
 		// this._vSmallChar.render();
 		this._vSpirit.render(textureMap, mtxLeftView, mtxLeftProj);
+		this._vFace.render(textureMap);
 	}
 }
 

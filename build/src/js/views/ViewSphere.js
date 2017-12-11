@@ -49,8 +49,6 @@ class ViewSphere extends alfrid.View {
 		if(!this._gamepad) {
 			if(VRUtils.rightHand) {
 				this._gamepad = VRUtils.rightHand;
-			} else if(VRUtils.leftHand) {
-				this._gamepad = VRUtils.leftHand;
 			} else {
 				return;
 			}
