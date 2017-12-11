@@ -12,12 +12,19 @@ html, body {
 
 	background: url(../../assets/img-css/bg.jpg);
 	background-size: cover;
+	touch-action: auto;
 }
 
 html {
 	-webkit-text-size-adjust: none;
 	-moz-text-size-adjust: none;
 	text-size-adjust: none;
+
+	overflow: hidden;
+}
+
+body {
+	overflow: auto;
 }
 
 h1,h2,h3,h4,text,p {
@@ -203,7 +210,7 @@ h1,h2,h3,h4,text,p {
 }
 
 
-.description {
+.desc {
 	position: fixed;
 	z-index: 10;
 	bottom: 7%;
@@ -228,5 +235,20 @@ h1,h2,h3,h4,text,p {
 
 	.hasVR & {
 		display: none;
+	}
+}
+
+
+.description {
+	.is-mobile & {
+		display: none;
+	}
+}
+
+.description-mobile {
+	display: none;
+	
+	.is-mobile & {
+		display: block;
 	}
 }

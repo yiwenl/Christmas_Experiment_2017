@@ -146,6 +146,7 @@ function _init3D() {
 
 	if(GL.isMobile) {
 		params.numParticles = 128;
+		document.body.classList.add('is-mobile');	
 	}
 
 	//	INIT ASSETS
@@ -156,7 +157,15 @@ function _init3D() {
 
 	//	CREATE SCENE
 	scene = new SceneApp();
-	
+
+	window.addEventListener("touchmove",function(e){e.preventDefault()},{passive:!1});
+
+	// addEventListener(document, "touchmove", function(e) {
+	//     console.log(e.defaultPrevented);  // will be false
+	//     e.preventDefault();   // does nothing since the listener is passive
+	//     console.log(e.defaultPrevented);  // still false
+	// }, {passive: false});
+	// }, false);
 }
 
 

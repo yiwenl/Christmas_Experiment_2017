@@ -3,6 +3,7 @@
 import alfrid, { GL } from 'alfrid';
 import Assets from '../Assets';
 import vs from 'shaders/sphere.vert';
+import vsIOS from 'shaders/sphereIos.vert';
 import fs from 'shaders/sphere.frag';
 import VRUtils from '../utils/VRUtils';
 
@@ -30,7 +31,12 @@ class ViewSphere extends alfrid.View {
 			this.orbControlSphere = new alfrid.OrbitalControl(this.cameraSphere, window, .01);
 			const easing = 0.1;
 			this.orbControlSphere.radius.value = .1;
-			this.orbControlSphere.ry.value = -.1;
+			if(!GL.isMobile) {
+				this.orbControlSphere.ry.value = -.1;	
+			} else {
+				this.orbControlSphere.ry.value = 0;	
+			}
+			
 			this.orbControlSphere.rx.easing = easing;
 			this.orbControlSphere.ry.easing = easing;
 			this.orbControlSphere.lockZoom(true);
