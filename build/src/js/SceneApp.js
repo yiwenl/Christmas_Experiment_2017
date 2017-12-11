@@ -1,6 +1,6 @@
 // SceneApp.js
 
-import alfrid, { Scene, GL } from 'alfrid';
+import alfrid, { Scene, GL, Ray } from 'alfrid';
 import Assets from './Assets';
 import VRUtils from './utils/VRUtils';
 import SubsceneParticles from './SubsceneParticles';
@@ -15,6 +15,7 @@ const scissor = function(x, y, w, h) {
 	GL.scissor(x, y, w, h);
 	GL.viewport(x, y, w, h);
 }
+
 
 class SceneApp extends Scene {
 	constructor() {
@@ -49,11 +50,12 @@ class SceneApp extends Scene {
 			vec3.set(this._hit, 999, 999, 999);
 		});
 		mat4.translate(this._touch.mtxModel, this._touch.mtxModel, vec3.fromValues(0, 0.5, z));
-
+		this._modelMatrixInvert = mat4.create();
+		mat4.invert(this._modelMatrixInvert, this._modelMatrix);
 
 		//	LIGHT
 		this._cameraLight = new alfrid.CameraOrtho();
-		const s = 3;
+		const s = 4;
 		this._cameraLight.ortho(-s, s, -s, s, .1, 15);
 		
 		this._cameraLight.lookAt([0, 10, z], [0, 0, z], [0, 0, -1]);
@@ -69,17 +71,20 @@ class SceneApp extends Scene {
 		mat4.multiply(this._shadowMatrix, this._cameraLight.projection, this._cameraLight.viewMatrix);
 		mat4.multiply(this._shadowMatrix, this._biasMatrix, this._shadowMatrix);
 
+		this._mtxIdentity = mat4.create();
 
 		this._mtxLeftView = mat4.create();
 		this._mtxLeftProj = mat4.create();
 		mat4.translate(this._modelMatrix, this._modelMatrix, vec3.fromValues(0, 0, z));
 
 		if(VRUtils.canPresent) {
-			
+			this._pointDir = vec3.create();
+			this._ray = new Ray([0, 0, 0], [0, 0, -1]);
 			GL.enable(GL.SCISSOR_TEST);
 			this.toRender();
+			this._touch.disconnect();
 
-			
+			this._gamepadTarget = vec3.create();
 		}
 
 		this.resize();
@@ -107,6 +112,7 @@ class SceneApp extends Scene {
 		this._vSphere  = new ViewSphere();
 		this._vFloor   = new ViewFloor();
 		this._vPointer = new ViewPointer();
+		this._vLine = new ViewLine();
 	}
 
 
@@ -135,6 +141,22 @@ class SceneApp extends Scene {
 		if(!VRUtils.canPresent) { this.toRender(); }
 	}
 
+	_checkTouch() {
+		if(!this._gamepad) {
+			if(VRUtils.leftHand) {
+				this._gamepad = VRUtils.leftHand;
+			} else {
+				return;
+			}
+		}
+		
+		const FRONT = vec3.fromValues(0, 0, -1);
+		vec3.transformQuat(this._ray.direction, FRONT, this._gamepad.orientation);
+		vec3.copy(this._ray.origin, this._gamepad.position);
+		this._touch.checkHitWithRay(this._ray);
+
+	}
+
 
 	toRender() {
 		if(VRUtils.canPresent) {	VRUtils.vrDisplay.requestAnimationFrame(()=>this.toRender());	}		
@@ -142,7 +164,7 @@ class SceneApp extends Scene {
 		VRUtils.getFrameData();
 
 		if(VRUtils.isPresenting && !GL.isMobile) {
-			
+			this._checkTouch();
 			const w2 = GL.width/2;
 			VRUtils.setCamera(this.cameraVR, 'left');
 
@@ -176,6 +198,7 @@ class SceneApp extends Scene {
 		} else {
 
 			if(VRUtils.canPresent) {
+				this._checkTouch();
 				VRUtils.setCamera(this.cameraVR, 'left');
 				mat4.copy(this.cameraVR.projection, this.camera.projection);
 
@@ -215,6 +238,12 @@ class SceneApp extends Scene {
 		
 		if(!GL.isMobile && VRUtils.hasVR) {
 			this._vPointer.render();	
+		}
+
+		if(this._gamepad && vec3.length(this._hit) < 999) {
+			GL.rotate(this._modelMatrixInvert);
+			vec3.add(this._gamepadTarget, this._ray.origin, this._ray.direction);
+			this._vLine.render(this._ray.origin, this._hit);
 		}
 	}
 

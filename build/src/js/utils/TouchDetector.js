@@ -117,6 +117,48 @@ class TouchDetector extends EventDispatcher {
 	}
 
 
+	checkHitWithRay(ray) {
+		let hit;
+		const v0 = vec3.create();
+		const v1 = vec3.create();
+		const v2 = vec3.create();
+		let dist = 0;
+
+		const getVector = (v, target) => {
+			vec3.transformMat4(target, v, this.mtxModel);
+		};
+
+		for(let i = 0; i < this.faceVertices.length; i++) {
+			const vertices = this.faceVertices[i];
+			getVector(vertices[0], v0); 
+			getVector(vertices[1], v1); 
+			getVector(vertices[2], v2); 
+			const t = ray.intersectTriangle(v0, v1, v2);
+
+			if(t) {
+				if(hit) {
+					const distToCam = vec3.dist(t, ray.origin);
+					if(distToCam < dist) {
+						hit = vec3.clone(t);
+						dist = distToCam;
+					}
+				} else {
+					hit = vec3.clone(t);
+					dist = vec3.dist(hit, ray.origin);
+				}	
+			}
+		}
+
+
+		if(hit) {
+			this._hit = vec3.clone(hit);
+			this.dispatchCustomEvent('onHit', { hit });
+		} else {
+			this.dispatchCustomEvent('onUp');
+		}
+	}
+
+
 	_onDown(e) {
 		this._firstPos = getMouse(e);
 		this._lastPos = getMouse(e);
